@@ -12,3 +12,12 @@ export const getGuildsChannel = async (client: Client, guildId: string) => {
     console.error("Something went wrong");
   }
 };
+
+export const getAllGuilds = async (client: Client) => {
+  try {
+    const guilds = client.guilds.cache.map((guild) => guild);
+    return guilds;
+  } catch (e) {
+    console.error("Something went wrong");
+  }
+};
