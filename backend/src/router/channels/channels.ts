@@ -2,17 +2,13 @@ import { getAllGuilds } from "@/services/discord/getGuildsChannel";
 import express from "express";
 import client from "@/discordjs";
 import { getChannels } from "@/services/discord/getChannels";
-import {
-  Guild,
-  TextChannel,
-  PartialGroupDMChannel,
-} from "discord.js-selfbot-v13";
+import { Guild, TextChannel } from "discord.js-selfbot-v13";
 
 const router = express.Router();
 
 interface GuildWithChannels {
   guild: Guild;
-  channelsDetails: Array<TextChannel | PartialGroupDMChannel>;
+  channelsDetails: Array<TextChannel>;
 }
 
 router.get("", async (_, res) => {
@@ -32,6 +28,8 @@ router.get("", async (_, res) => {
           client,
           guild.channels.cache.map((channel) => channel.id),
         );
+
+        channels.sort((a, b) => a.rawPosition - b.rawPosition);
 
         guildsWithChannels.push({ guild, channelsDetails: channels });
       } catch (e) {
