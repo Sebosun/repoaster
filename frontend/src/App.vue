@@ -3,8 +3,12 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <div class="mx-auto min-w-[900px]">
+  <div class="mx-auto min-w-[900px] lowercase">
     <RouterView />
+    <label class="label cursor-pointer">
+      <span class="label-text">Remember me</span>
+      <input type="checkbox" checked="checked" class="checkbox" />
+    </label>
   </div>
 </template>
 

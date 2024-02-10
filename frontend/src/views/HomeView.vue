@@ -25,10 +25,15 @@ const guilds = ref<GuildType[]>([])
 const checkedChannels = ref<[]>([])
 
 onMounted(async () => {
-  const items = await getGuildFiles()
-  const body = await items.json()
-  guilds.value = body
-  console.log(body)
+  try {
+    const items = await getGuildFiles()
+    const body = await items.json()
+    guilds.value = body
+    console.log(body)
+  } catch (error) {
+    console.error(error)
+    window.alert('Backend is not running (likely)')
+  }
 })
 
 const getChannelName = (index: number, channelId: string) => {
@@ -44,16 +49,25 @@ const getChannelName = (index: number, channelId: string) => {
   <main class="text-white">
     <div class="grid grid-cols-2 p-8 bg-gray-800 text-gray-200">
       <div>
-        <div v-for="(guild, index) in guilds">
-          <div>{{ guild.guild.name }}</div>
-          <template v-for="channel in guild.guild.channels" :key="channel">
-            <div class="flex gap-4 text-2xl" v-if="getChannelName(index, channel)">
-              <input type="checkbox" :id="channel" :value="channel" v-model="checkedChannels" />
-              <label :for="getChannelName(index, channel)">{{
-                getChannelName(index, channel)
-              }}</label>
-            </div>
-          </template>
+        <div v-if="guilds" class="collapse" v-for="(guild, index) in guilds">
+          <input type="checkbox" />
+          <div class="collapse-title text-xl font-medium">{{ guild.guild.name }}</div>
+          <div class="collapse-content">
+            <template v-for="channel in guild.guild.channels" :key="channel">
+              <div v-if="getChannelName(index, channel)">
+                <label class="label cursor-pointer">
+                  <input
+                    class="checkbox checkbox-primary"
+                    type="checkbox"
+                    :id="channel"
+                    :value="channel"
+                    v-model="checkedChannels"
+                  />
+                  <span class="text-lg">{{ getChannelName(index, channel) }} </span>
+                </label>
+              </div>
+            </template>
+          </div>
         </div>
       </div>
       <UploadFile :target-channels="checkedChannels" />
