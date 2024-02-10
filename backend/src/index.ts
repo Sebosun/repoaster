@@ -1,2 +1,2 @@
-import "./discordjs";
 import "./server";
+import "./discordjs";

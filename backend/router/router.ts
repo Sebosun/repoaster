@@ -14,8 +14,12 @@ router.post("/upload", upload.single("image"), function (req, res) {
     return;
   }
 
-  const message = `File ${req.file.filename} has sent`;
-  postOnChannel(client, "1127931845280026627", message);
+  postOnChannel(
+    client,
+    "1127931845280026627",
+    req.file.path,
+    req.file.filename,
+  );
 
   res.status(200);
   res.json();
