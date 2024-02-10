@@ -8,19 +8,30 @@ const router = Router();
 
 // TODO: Check out how to properly handle input validation
 // I don't like manually checking it lol - zod?
-router.post("/upload", upload.single("image"), function (req, res) {
+router.post("/upload", upload.single("image"), async function (req, res) {
   if (!req.file) {
     res.status(400);
     res.json({ message: "Missing file" });
     return;
   }
 
-  postOnChannel(
-    client,
-    "1127931845280026627",
-    req.file.path,
-    req.file.filename,
-  );
+  if (!req.body.channels) {
+    res.status(400);
+    res.json({ message: "Missing channels" });
+    return;
+  }
+
+  try {
+    const channels = JSON.parse(req.body.channels);
+
+    for (const channel of channels) {
+      await postOnChannel(client, channel, req.file.path, req.file.filename);
+    }
+  } catch (e) {
+    res.status(500);
+    res.json({ message: "Something went wrong" });
+    return;
+  }
 
   res.status(200);
   res.json();

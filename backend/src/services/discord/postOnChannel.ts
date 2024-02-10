@@ -10,5 +10,5 @@ export const postOnChannel = (
   if (!channel) throw new Error("Channel not found");
   if (!(channel instanceof TextChannel))
     throw new Error("Channel is not a text channel");
-  channel.send({ files: [{ attachment: file, name: filename }] });
+  return channel.send({ files: [{ attachment: file, name: filename }] });
 };
