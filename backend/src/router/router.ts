@@ -1,7 +1,8 @@
 import { Router } from "express";
-import client from "../src/discordjs";
+import client from "@/discordjs";
 import { postOnChannel } from "../services/discord/postOnChannel";
 import { upload } from "../services/multer";
+import channels from "@/router/channels/channels";
 
 const router = Router();
 
@@ -24,5 +25,7 @@ router.post("/upload", upload.single("image"), function (req, res) {
   res.status(200);
   res.json();
 });
+
+router.use("/channels", channels);
 
 export default router;
