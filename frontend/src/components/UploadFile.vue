@@ -1,4 +1,7 @@
 <script setup lang="ts">
+const props = defineProps<{
+  targetChannels: string[]
+}>()
 const baseURL = 'http://localhost:3000'
 const onFileChanged = async (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -9,6 +12,7 @@ const onFileChanged = async (event: Event) => {
   }
   const formData = new FormData()
   formData.append('image', files[0])
+  formData.append('channels', JSON.stringify(props.targetChannels))
   try {
     await fetch(`${baseURL}/upload`, {
       method: 'POST',
@@ -21,7 +25,10 @@ const onFileChanged = async (event: Event) => {
 </script>
 
 <template>
-  <div class="text-center">
-    <input type="file" @change="onFileChanged" accept="image/*" capture />
-  </div>
+  <main>
+    <h1 class="text-center text-8xl mb-20">Image upload app</h1>
+    <div class="text-center">
+      <input type="file" @change="onFileChanged" accept="image/*" capture />
+    </div>
+  </main>
 </template>
