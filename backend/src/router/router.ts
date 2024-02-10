@@ -3,6 +3,7 @@ import client from "@/discordjs";
 import { postOnChannel } from "../services/discord/postOnChannel";
 import { upload } from "../services/multer";
 import channels from "@/router/channels/channels";
+import { timeout } from "@/helpers/timeout";
 
 const router = Router();
 
@@ -26,6 +27,7 @@ router.post("/upload", upload.single("image"), async function (req, res) {
 
     for (const channel of channels) {
       await postOnChannel(client, channel, req.file.path, req.file.filename);
+      await timeout(Math.floor(Math.random() * 1000));
     }
   } catch (e) {
     res.status(500);
