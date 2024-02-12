@@ -4,7 +4,9 @@ import { ref } from 'vue'
 const props = defineProps<{
   targetChannels: string[]
 }>()
+
 const baseURL = 'http://localhost:3000'
+const inputRef = ref<HTMLInputElement>()
 
 const formData = ref<FormData>()
 
@@ -31,6 +33,7 @@ const onSubmit = async () => {
     })
     if (response.ok) window.alert('File uploaded successfully')
     formData.value = undefined
+    if (inputRef.value) inputRef.value.value = ''
   } catch (e) {
     console.error(e)
   }
@@ -41,22 +44,24 @@ const onSubmit = async () => {
   <main>
     <h1 class="text-center text-4xl py-5 px-20 mb-20">Upload meme</h1>
     <div class="flex items-center justify-center gap-8">
-      <input
-        class="file-input file-input-ghost file-input-bordered w-full max-w-xs"
-        :class="[!formData ? 'text-rose-400' : '']"
-        type="file"
-        @change="onFileChanged"
-        accept="image/*"
-        capture
-      />
-      <button
-        class="btn btn-accent"
-        :class="[!formData ? 'btn-error' : '']"
-        :disabled="!formData"
-        @click="onSubmit"
-      >
-        Submit
-      </button>
+      <form enctype="multipart/form-data" @submit.prevent="onSubmit">
+        <input
+          ref="inputRef"
+          class="file-input file-input-ghost file-input-bordered w-full max-w-xs"
+          :class="[!formData ? 'text-rose-400' : '']"
+          type="file"
+          @change="onFileChanged"
+          accept="image/*,video/*"
+          capture
+        />
+        <button
+          class="btn btn-accent"
+          :class="[!formData ? 'btn-error' : '']"
+          :disabled="!formData"
+        >
+          Submit
+        </button>
+      </form>
     </div>
   </main>
 </template>
