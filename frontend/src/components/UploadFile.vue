@@ -49,7 +49,7 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <main>
+  <section>
     <h1 class="text-center text-4xl py-5 px-20 mb-20">Upload meme</h1>
     <div>
       <form class="flex flex-col" enctype="multipart/form-data" @submit.prevent="onSubmit">
@@ -77,5 +77,5 @@ const onSubmit = async () => {
         </button>
       </form>
     </div>
-  </main>
+  </section>
 </template>

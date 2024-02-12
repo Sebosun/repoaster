@@ -2,6 +2,8 @@
 import UploadFile from '@/components/UploadFile.vue'
 import { getGuildFiles } from '@/services/getGuildFiles'
 import { onMounted, ref } from 'vue'
+import { areArraysDiff } from '@/utils/areArraysDiff'
+import { computed } from '@vue/reactivity'
 
 type ChannelType = {
   id: string
@@ -22,16 +24,25 @@ type GuildType = {
 }
 
 const guilds = ref<GuildType[]>([])
-const checkedChannels = ref<[]>([])
+
+const getLocalChannels = () => {
+  try {
+    const channels = localStorage.getItem('channels')
+    if (channels) return JSON.parse(channels)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const localStorageItems = ref<string[]>(getLocalChannels() || [])
+const selectedChannels = ref<string[]>(localStorageItems.value)
 
 onMounted(async () => {
   try {
     const items = await getGuildFiles()
     const body = await items.json()
     guilds.value = body
-    console.log(body)
   } catch (error) {
-    console.error(error)
     window.alert('Backend is not running (likely)')
   }
 })
@@ -43,15 +54,41 @@ const getChannelName = (index: number, channelId: string) => {
 
   return channelName
 }
+
+const saveCurrentChannels = () => {
+  try {
+    /* TODO: notfis */
+    localStorageItems.value = selectedChannels.value
+    localStorage.setItem('channels', JSON.stringify(selectedChannels.value))
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const areLocalItemsDiff = computed(() => {
+  return areArraysDiff(selectedChannels.value, localStorageItems.value)
+})
 </script>
 
 <template>
   <main class="text-white mx-auto min-w-96 w-full">
-    <div class="grid grid-cols-2 p-8 bg-gray-800 text-gray-200">
+    <div class="grid grid-cols-2 p-8 gap-8 bg-gray-800 text-gray-200">
       <div>
+        <div class="flex items-center gap-4" v-if="selectedChannels?.length && !areLocalItemsDiff">
+          <label class="form-control w-full max-w-xs">
+            <input
+              type="text"
+              placeholder="Filter by name..."
+              class="input input-bordered w-full max-w-xs"
+            />
+          </label>
+          <Button class="btn" @click="saveCurrentChannels"> Save </Button>
+        </div>
         <div v-if="guilds" class="collapse" v-for="(guild, index) in guilds">
           <input type="checkbox" />
-          <div class="collapse-title text-xl font-medium">{{ guild.guild.name }}</div>
+          <div class="collapse-title text-xl font-medium bg-base-200 rounded-md my-4">
+            {{ guild.guild.name }}
+          </div>
           <div class="collapse-content">
             <template v-for="channel in guild.guild.channels" :key="channel">
               <div v-if="getChannelName(index, channel)">
@@ -61,7 +98,7 @@ const getChannelName = (index: number, channelId: string) => {
                     type="checkbox"
                     :id="channel"
                     :value="channel"
-                    v-model="checkedChannels"
+                    v-model="selectedChannels"
                   />
                   <span class="text-lg">{{ getChannelName(index, channel) }} </span>
                 </label>
@@ -70,7 +107,7 @@ const getChannelName = (index: number, channelId: string) => {
           </div>
         </div>
       </div>
-      <UploadFile :target-channels="checkedChannels" />
+      <UploadFile :target-channels="selectedChannels" />
     </div>
   </main>
 </template>
