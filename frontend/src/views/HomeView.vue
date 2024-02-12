@@ -46,7 +46,7 @@ const getChannelName = (index: number, channelId: string) => {
 </script>
 
 <template>
-  <main class="text-white">
+  <main class="text-white mx-auto min-w-96 w-full">
     <div class="grid grid-cols-2 p-8 bg-gray-800 text-gray-200">
       <div>
         <div v-if="guilds" class="collapse" v-for="(guild, index) in guilds">
