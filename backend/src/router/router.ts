@@ -1,6 +1,6 @@
 import { Router } from "express";
 import client from "@/discordjs";
-import { postOnChannel } from "../services/discord/postOnChannel";
+import { postMediaOnChannel } from "../services/discord/postOnChannel";
 import { upload } from "../services/multer";
 import channels from "@/router/channels/channels";
 import message from "@/router/message";
@@ -27,7 +27,12 @@ router.post("/upload", upload.single("image"), async function (req, res) {
     const channels = JSON.parse(req.body.channels);
 
     for (const channel of channels) {
-      await postOnChannel(client, channel, req.file.path, req.file.filename);
+      await postMediaOnChannel(
+        client,
+        channel,
+        req.file.path,
+        req.file.filename,
+      );
       await timeout(Math.floor(Math.random() * 1000));
     }
   } catch (e) {
