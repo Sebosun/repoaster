@@ -3,6 +3,7 @@ import client from "@/discordjs";
 import { postOnChannel } from "../services/discord/postOnChannel";
 import { upload } from "../services/multer";
 import channels from "@/router/channels/channels";
+import message from "@/router/message";
 import { timeout } from "@/helpers/timeout";
 
 const router = Router();
@@ -40,5 +41,6 @@ router.post("/upload", upload.single("image"), async function (req, res) {
 });
 
 router.use("/channels", channels);
+router.use("/message", message);
 
 export default router;
