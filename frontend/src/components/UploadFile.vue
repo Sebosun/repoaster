@@ -15,7 +15,8 @@ const previewLink = computed(() => {
   return window.URL.createObjectURL(previewFile.value)
 })
 
-const formData = ref<FormData>()
+const fileData = ref<FormData>()
+const hasFileData = computed(() => !!fileData.value)
 
 const onFileChanged = async (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -28,19 +29,19 @@ const onFileChanged = async (event: Event) => {
   previewFile.value = files[0]
   tempFormData.append('image', files[0])
   tempFormData.append('channels', JSON.stringify(props.targetChannels))
-  formData.value = tempFormData
+  fileData.value = tempFormData
 }
 
 const onSubmit = async () => {
-  if (!formData.value) return
+  if (!fileData.value) return
 
   try {
     const response = await fetch(`${baseURL}/upload`, {
       method: 'POST',
-      body: formData.value
+      body: fileData.value
     })
     if (response.ok) window.alert('File uploaded successfully')
-    formData.value = undefined
+    fileData.value = undefined
     if (inputRef.value) inputRef.value.value = ''
   } catch (e) {
     console.error(e)
@@ -50,13 +51,13 @@ const onSubmit = async () => {
 
 <template>
   <section>
-    <h1 class="text-center text-4xl py-5 px-20 mb-20">Upload meme</h1>
+    <h1 class="text-4xl py-5 text-center">Upload meme</h1>
     <div>
       <form class="flex flex-col" enctype="multipart/form-data" @submit.prevent="onSubmit">
         <input
           ref="inputRef"
           class="file-input file-input-ghost file-input-bordered w-full"
-          :class="[!formData ? 'text-rose-400' : '']"
+          :class="[!hasFileData ? 'text-rose-400' : '']"
           type="file"
           @change="onFileChanged"
           accept="image/*,video/*"
@@ -69,9 +70,10 @@ const onSubmit = async () => {
         </div>
 
         <button
+          type="submit"
           class="btn btn-accent text-end mt-5"
-          :class="[!formData ? 'btn-error' : '']"
-          :disabled="!formData"
+          :class="[!hasFileData ? 'btn-error' : '']"
+          :disabled="!hasFileData"
         >
           Submit
         </button>

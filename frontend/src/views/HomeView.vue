@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import UploadFile from '@/components/UploadFile.vue'
+import PostMessage from '@/components/PostMessage.vue'
 import { getGuildFiles } from '@/services/getGuildFiles'
 import { onMounted, ref } from 'vue'
 import { areArraysDiff } from '@/utils/areArraysDiff'
@@ -82,7 +83,7 @@ const areLocalItemsDiff = computed(() => {
               class="input input-bordered w-full max-w-xs"
             />
           </label>
-          <Button class="btn" @click="saveCurrentChannels"> Save </Button>
+          <button class="btn" @click="saveCurrentChannels">Save</button>
         </div>
         <div v-if="guilds" class="collapse" v-for="(guild, index) in guilds">
           <input type="checkbox" />
@@ -107,7 +108,10 @@ const areLocalItemsDiff = computed(() => {
           </div>
         </div>
       </div>
-      <UploadFile :target-channels="selectedChannels" />
+      <div>
+        <UploadFile :target-channels="selectedChannels" />
+        <PostMessage class="mt-8" :target-channels="selectedChannels" />
+      </div>
     </div>
   </main>
 </template>
