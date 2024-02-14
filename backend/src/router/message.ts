@@ -19,10 +19,11 @@ router.post("", async (req, res) => {
     for (const channel of channels) {
       await postMessageOnChannel(client, channel, message);
     }
+    res.status(200);
+    res.json();
   } catch (e) {
     res.status(500);
     res.json({ message: "Something went wrong" });
-    return;
   }
 });
 
