@@ -27,6 +27,18 @@ type GuildType = {
 const guildsArray = ref<GuildType[]>([])
 const searchChannel = ref('')
 
+const getLocalChannels = () => {
+  try {
+    const channels = localStorage.getItem('channels')
+    if (channels) return JSON.parse(channels)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const localStorageItems = ref<string[]>(getLocalChannels() || [])
+const selectedChannels = ref<string[]>(localStorageItems.value)
+
 const guildsFiltered = computed(() => {
   return guildsArray.value.map((guild, index) => {
     const newChannels = guild.guild.channels.filter((channel) => {
@@ -41,18 +53,6 @@ const guildsFiltered = computed(() => {
     return guildReturn
   })
 })
-
-const getLocalChannels = () => {
-  try {
-    const channels = localStorage.getItem('channels')
-    if (channels) return JSON.parse(channels)
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-const localStorageItems = ref<string[]>(getLocalChannels() || [])
-const selectedChannels = ref<string[]>(localStorageItems.value)
 
 onMounted(async () => {
   try {
@@ -85,6 +85,23 @@ const saveCurrentChannels = () => {
 const areLocalItemsDiff = computed(() => {
   return areArraysDiff(selectedChannels.value, localStorageItems.value)
 })
+
+const getSelectedChannelDetails = computed(() => {
+  /* { id: string, name: string} */
+  const acc = [] as ChannelType[]
+  // possible perfm issues with larger amount of channels?
+  guildsArray.value.forEach((guild) => {
+    selectedChannels.value.forEach((item) => {
+      const channel = guild.channelsDetails.find((channel) => channel.id === item)
+      if (channel) acc.push(channel)
+    })
+  })
+  return acc
+})
+
+const getSelectedChannelsNames = computed(() =>
+  getSelectedChannelDetails.value.map((item) => item.name)
+)
 </script>
 
 <template>
@@ -111,8 +128,14 @@ const areLocalItemsDiff = computed(() => {
     </label>
     <div class="grid grid-cols-2 p-8 gap-8 bg-gray-800 text-gray-200">
       <div>
-        <div class="flex items-center gap-4" v-if="selectedChannels?.length && !areLocalItemsDiff">
-          <button class="btn" @click="saveCurrentChannels">Save</button>
+        <div class="flex flex-wrap items-center gap-4" v-if="selectedChannels?.length">
+          Sending to:
+          <div class="kbd" v-for="channel in getSelectedChannelsNames">
+            {{ channel }}
+          </div>
+          <button class="btn" :disabled="areLocalItemsDiff" @click="saveCurrentChannels">
+            Save
+          </button>
         </div>
         <div v-if="guildsArray" class="collapse" v-for="(guild, index) in guildsFiltered">
           <input type="checkbox" />
