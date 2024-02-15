@@ -88,7 +88,6 @@ const areLocalItemsDiff = computed(() => {
 })
 
 const getSelectedChannelDetails = computed(() => {
-  /* { id: string, name: string} */
   const acc = [] as ChannelType[]
   // possible perfm issues with larger amount of channels?
   guildsArray.value.forEach((guild) => {

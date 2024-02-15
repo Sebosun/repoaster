@@ -2,11 +2,13 @@
 import { ref } from 'vue'
 
 const message = ref('')
+const isLoading = ref(false)
 const props = defineProps<{
   targetChannels: string[]
 }>()
 
 const postMessage = async () => {
+  isLoading.value = true
   try {
     const response = await fetch('http://localhost:3000/message', {
       method: 'POST',
@@ -20,6 +22,8 @@ const postMessage = async () => {
     }
   } catch (e) {
     console.error(e)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -40,9 +44,10 @@ const postMessage = async () => {
           type="submit"
           class="btn btn-accent text-end mt-5 w-full"
           :class="[!message ? 'btn-error' : '']"
-          :disabled="!message"
+          :disabled="!message || isLoading"
         >
           Submit
+          <span v-if="isLoading" class="loading loading-spinner loading-xs"></span>
         </button>
       </div>
     </form>

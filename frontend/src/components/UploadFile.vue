@@ -9,6 +9,7 @@ const props = defineProps<{
 const baseURL = 'http://localhost:3000'
 const inputRef = ref<HTMLInputElement>()
 const previewFile = ref<File>()
+const isLoading = ref(false)
 
 const previewLink = computed(() => {
   if (!previewFile.value) return ''
@@ -34,6 +35,7 @@ const onFileChanged = async (event: Event) => {
 
 const onSubmit = async () => {
   if (!fileData.value) return
+  isLoading.value = true
 
   try {
     const response = await fetch(`${baseURL}/upload`, {
@@ -45,6 +47,8 @@ const onSubmit = async () => {
     if (inputRef.value) inputRef.value.value = ''
   } catch (e) {
     console.error(e)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
@@ -64,10 +68,20 @@ const onSubmit = async () => {
           capture
         />
 
-        <div class="my-4" v-if="previewFile">
-          <img class="rounded-md" v-if="previewFile.type.includes('image')" :src="previewLink" />
-          <video class="rounded-md" v-else :src="previewLink" controls />
-        </div>
+        <Transition>
+          <div class="my-4" v-if="previewFile">
+            <img
+              class="rounded-md max-h-96 w-auto mx-auto"
+              v-if="previewFile.type.includes('image')"
+              :src="previewLink"
+            />
+            <video
+              class="rounded-md max-h-96 w-auto mx-auto"
+              v-else
+              :src="previewLink"
+              controls
+            /></div
+        ></Transition>
 
         <button
           type="submit"
@@ -76,8 +90,19 @@ const onSubmit = async () => {
           :disabled="!hasFileData"
         >
           Submit
+          <span v-if="isLoading" class="loading loading-spinner loading-xs"></span>
         </button>
       </form>
     </div>
   </section>
 </template>
+<style scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 1s;
+}
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+</style>
