@@ -24,7 +24,23 @@ type GuildType = {
   channelsDetails: ChannelType[]
 }
 
-const guilds = ref<GuildType[]>([])
+const guildsArray = ref<GuildType[]>([])
+const searchChannel = ref('')
+
+const guildsFiltered = computed(() => {
+  return guildsArray.value.map((guild, index) => {
+    const newChannels = guild.guild.channels.filter((channel) => {
+      const channelName = getChannelName(index, channel)
+      return channelName?.includes(searchChannel.value)
+    })
+
+    const guildReturn = {
+      guild: { ...guild.guild, channels: newChannels },
+      channelsDetails: guild.channelsDetails
+    }
+    return guildReturn
+  })
+})
 
 const getLocalChannels = () => {
   try {
@@ -42,14 +58,14 @@ onMounted(async () => {
   try {
     const items = await getGuildFiles()
     const body = await items.json()
-    guilds.value = body
+    guildsArray.value = body
   } catch (error) {
     window.alert('Backend is not running (likely)')
   }
 })
 
 const getChannelName = (index: number, channelId: string) => {
-  const currentGuild = guilds.value[index]
+  const currentGuild = guildsArray.value[index]
   const channels = currentGuild?.channelsDetails
   const channelName = channels?.find((channel) => channel.id === channelId)?.name
 
@@ -73,22 +89,36 @@ const areLocalItemsDiff = computed(() => {
 
 <template>
   <main class="text-white mx-auto min-w-96 w-full">
+    <label class="ml-8 input input-bordered flex items-center gap-2 max-w-96 my-5">
+      <input
+        type="text"
+        class="grow bg-inherit input-bordered input-primary"
+        placeholder="Search"
+        v-model="searchChannel"
+      />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 16 16"
+        fill="currentColor"
+        class="w-4 h-4 opacity-70"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+          clip-rule="evenodd"
+        />
+      </svg>
+    </label>
     <div class="grid grid-cols-2 p-8 gap-8 bg-gray-800 text-gray-200">
       <div>
         <div class="flex items-center gap-4" v-if="selectedChannels?.length && !areLocalItemsDiff">
-          <label class="form-control w-full max-w-xs">
-            <input
-              type="text"
-              placeholder="Filter by name..."
-              class="input input-bordered w-full max-w-xs"
-            />
-          </label>
           <button class="btn" @click="saveCurrentChannels">Save</button>
         </div>
-        <div v-if="guilds" class="collapse" v-for="(guild, index) in guilds">
+        <div v-if="guildsArray" class="collapse" v-for="(guild, index) in guildsFiltered">
           <input type="checkbox" />
           <div class="collapse-title text-xl font-medium bg-base-200 rounded-md my-4">
             {{ guild.guild.name }}
+            <span class="opacity-50"> ({{ guild.guild.channels.length }}) </span>
           </div>
           <div class="collapse-content">
             <template v-for="channel in guild.guild.channels" :key="channel">
