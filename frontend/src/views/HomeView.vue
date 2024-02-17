@@ -110,11 +110,11 @@ const getSelectedChannelsNames = computed(() =>
     <div class="grid grid-cols-2 p-8 gap-8 bg-gray-800 text-gray-200">
       <div>
         <div class="flex flex-wrap items-center gap-4" v-if="selectedChannels?.length">
-          Sending to:
+          Sending to {{ selectedChannels.length }} channels:
           <div class="kbd" v-for="channel in getSelectedChannelsNames">
             {{ channel }}
           </div>
-          <button class="btn" :disabled="areLocalItemsDiff" @click="saveCurrentChannels">
+          <button class="btn btn-sm" :disabled="areLocalItemsDiff" @click="saveCurrentChannels">
             Save
           </button>
         </div>
