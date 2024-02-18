@@ -23,8 +23,15 @@ router.post("/upload", upload.single("image"), async function (req, res) {
     return;
   }
 
+  if (!req.body.message) {
+    res.status(400);
+    res.json({ message: "Missing message" });
+    return;
+  }
+
   try {
     const channels = JSON.parse(req.body.channels);
+    const message = JSON.parse(req.body.message) as string | undefined;
 
     for (const channel of channels) {
       await postMediaOnChannel(
@@ -32,6 +39,7 @@ router.post("/upload", upload.single("image"), async function (req, res) {
         channel,
         req.file.path,
         req.file.filename,
+        message,
       );
       await timeout(Math.floor(Math.random() * 1000));
     }

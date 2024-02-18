@@ -7,12 +7,16 @@ function postMediaOnChannel(
   channelId: string,
   file: string,
   filename: string,
+  message?: string,
 ) {
   const channel = client.channels.cache.get(channelId);
   if (!channel) throw new Error("Channel not found");
   if (!(channel instanceof TextChannel))
     throw new Error("Channel is not a text channel");
-  return channel.send({ files: [{ attachment: file, name: filename }] });
+  return channel.send({
+    files: [{ attachment: file, name: filename }],
+    content: message,
+  });
 }
 
 function postMessageOnChannel(
