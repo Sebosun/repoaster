@@ -13,6 +13,7 @@ const isLoading = ref(false)
 
 const previewLink = computed(() => {
   if (!previewFile.value) return ''
+  console.log(previewFile.value)
   return window.URL.createObjectURL(previewFile.value)
 })
 
@@ -29,6 +30,7 @@ const onFileChanged = async (event: Event) => {
   const tempFormData = new FormData()
   previewFile.value = files[0]
   tempFormData.append('image', files[0])
+  tempFormData.append('message', JSON.stringify('test'))
   tempFormData.append('channels', JSON.stringify(props.targetChannels))
   fileData.value = tempFormData
 }

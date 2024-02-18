@@ -1,11 +1,9 @@
+import { Request, Response } from "express";
 import client from "@/discordjs";
-import express from "express";
 import { postMessageOnChannel } from "@/services/discord/postOnChannel";
 import { messageSchema } from "@/schemas/messageSchema";
 
-const router = express.Router();
-
-router.post("", async (req, res) => {
+export async function handleSendDiscordMsg(req: Request, res: Response) {
   const input = messageSchema.safeParse(req.body);
   if (!input.success) {
     res.status(400);
@@ -25,6 +23,4 @@ router.post("", async (req, res) => {
     res.status(500);
     res.json({ message: "Something went wrong" });
   }
-});
-
-export default router;
+}

@@ -1,17 +1,14 @@
+import { Request, Response } from "express";
 import { getAllGuilds } from "@/services/discord/getGuildsChannel";
-import express from "express";
 import client from "@/discordjs";
 import { getChannels } from "@/services/discord/getChannels";
 import { Guild, TextChannel } from "discord.js-selfbot-v13";
-
-const router = express.Router();
 
 interface GuildWithChannels {
   guild: Guild;
   channelsDetails: Array<TextChannel>;
 }
-
-router.get("", async (_, res) => {
+export async function handleGetDiscordChannels(_: Request, res: Response) {
   try {
     const guilds = await getAllGuilds(client);
     if (!guilds?.length) {
@@ -41,6 +38,4 @@ router.get("", async (_, res) => {
   } catch (e) {
     res.status(500).json({ message: "GET /channels" });
   }
-});
-
-export default router;
+}
