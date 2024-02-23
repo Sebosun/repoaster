@@ -30,7 +30,7 @@ const postMessage = async () => {
 
 <template>
   <section>
-    <h1 class="text-4xl text-center">Post a message</h1>
+    <h1 class="text-4xl text-center">Message</h1>
     <form @submit.prevent="postMessage">
       <div class="my-4">
         <input

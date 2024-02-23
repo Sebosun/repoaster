@@ -144,7 +144,6 @@ const getSelectedChannelsNames = computed(() =>
       </div>
       <div>
         <UploadFile :target-channels="selectedChannels" />
-        <PostMessage class="mt-8" :target-channels="selectedChannels" />
       </div>
     </div>
   </main>
