@@ -1,16 +1,20 @@
-import { TextChannel, type Client } from "discord.js-selfbot-v13";
+import { TextChannel, type Client, AnyChannel } from "discord.js-selfbot-v13";
 import { z } from "zod";
 import { isTwitterLink, parseTwitterLink } from "@/helpers/parseTwitterLink";
 
-function postMediaOnChannel(
+async function postMediaOnChannel(
   client: Client,
   channelId: string,
   file: string,
   filename: string,
   message?: string,
 ) {
-  const channel = client.channels.cache.get(channelId);
-  if (!channel) throw new Error("Channel not found");
+  let channel = client.channels.cache.get(channelId);
+  if (!channel) {
+    const fetched = await client.channels.fetch(channelId);
+    if (fetched) channel = fetched;
+  }
+  if (!channel) throw new Error(`Channel ${channelId} not found`);
   if (!(channel instanceof TextChannel))
     throw new Error("Channel is not a text channel");
   return channel.send({
@@ -19,13 +23,17 @@ function postMediaOnChannel(
   });
 }
 
-function postMessageOnChannel(
+async function postMessageOnChannel(
   client: Client,
   channelId: string,
   message: string,
 ) {
-  const channel = client.channels.cache.get(channelId);
-  if (!channel) throw new Error("Channel not found");
+  let channel = client.channels.cache.get(channelId);
+  if (!channel) {
+    const fetched = await client.channels.fetch(channelId);
+    if (fetched) channel = fetched;
+  }
+  if (!channel) throw new Error(`Channel ${channelId} not found`);
   if (!(channel instanceof TextChannel))
     throw new Error("Channel is not a text channel");
   const urlSchema = z.string().url();
