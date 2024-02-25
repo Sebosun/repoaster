@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from '@vue/reactivity'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import AlertSuccess from '@/components/alerts/AlertSuccess.vue'
 
 const props = defineProps<{
   targetChannels: string[]
@@ -10,6 +11,7 @@ const baseURL = 'http://localhost:3000'
 const inputRef = ref<HTMLInputElement>()
 const previewFile = ref<File>()
 const isLoading = ref(false)
+const uploadSuccess = ref(false)
 const message = ref('')
 
 const previewLink = computed(() => {
@@ -55,20 +57,28 @@ const onSubmit = async () => {
       method: 'POST',
       body: fileData.value
     })
-    if (response.ok) window.alert('File uploaded successfully')
+    if (!response.ok) throw new Error('Failed to upload')
     fileData.value = undefined
     if (inputRef.value) inputRef.value.value = ''
+    uploadSuccess.value = true
   } catch (e) {
     console.error(e)
   } finally {
     isLoading.value = false
   }
 }
+
+watch([() => message.value, () => fileData.value], ([messageValue, fileDataValue]) => {
+  if (messageValue || fileDataValue) {
+    uploadSuccess.value = false
+  }
+})
 </script>
 
 <template>
   <section>
     <h1 class="text-4xl py-5 text-center">Repoast content</h1>
+    <AlertSuccess v-if="uploadSuccess" class="mb-4" message="Succesfully uploaded image" />
     <div>
       <form class="flex flex-col" enctype="multipart/form-data" @submit.prevent="onSubmit">
         <input
