@@ -40,10 +40,11 @@ const getLocalChannels = () => {
 const localStorageItems = ref<string[]>(getLocalChannels() || [])
 const selectedChannels = ref<string[]>(localStorageItems.value)
 
-const guildsFiltered = computed(() => {
-  return guildsArray.value.map((guild, index) => {
+const guildsFiltered = computed<GuildType[]>(() => {
+  const acc = [] as GuildType[]
+  const guilds = guildsArray.value.forEach((guild, index) => {
     const newChannels = guild.guild.channels.filter((channel) => {
-      const channelName = getChannelName(index, channel)
+      const channelName = getChannelName(guild, channel)
       return channelName?.includes(searchChannel.value)
     })
 
@@ -51,8 +52,14 @@ const guildsFiltered = computed(() => {
       guild: { ...guild.guild, channels: newChannels },
       channelsDetails: guild.channelsDetails
     }
-    return guildReturn
+    acc.push(guildReturn)
   })
+
+  if (searchChannel.value.length > 0) {
+    acc.sort((_, second) => second.guild.channels.length)
+  }
+
+  return acc
 })
 
 onMounted(async () => {
@@ -65,9 +72,8 @@ onMounted(async () => {
   }
 })
 
-const getChannelName = (index: number, channelId: string) => {
-  const currentGuild = guildsArray.value[index]
-  const channels = currentGuild?.channelsDetails
+const getChannelName = (guild: GuildType, channelId: string) => {
+  const channels = guild?.channelsDetails
   const channelName = channels?.find((channel) => channel.id === channelId)?.name
 
   return channelName
@@ -118,24 +124,22 @@ const getSelectedChannelsNames = computed(() =>
             Save
           </button>
         </div>
-        <div v-if="guildsArray" class="collapse" v-for="(guild, index) in guildsFiltered">
+
+        <div v-if="guildsArray" class="collapse" v-for="guild in guildsFiltered">
           <input type="checkbox" />
+
           <div class="collapse-title text-xl font-medium bg-base-200 rounded-md my-4">
             {{ guild.guild.name }}
             <span class="opacity-50"> ({{ guild.guild.channels.length }}) </span>
           </div>
+
           <div class="collapse-content">
             <template v-for="channel in guild.guild.channels" :key="channel">
-              <div v-if="getChannelName(index, channel)">
+              <div v-if="getChannelName(guild, channel)">
                 <label class="label cursor-pointer">
-                  <input
-                    class="checkbox checkbox-primary"
-                    type="checkbox"
-                    :id="channel"
-                    :value="channel"
-                    v-model="selectedChannels"
-                  />
-                  <span class="text-lg">{{ getChannelName(index, channel) }} </span>
+                  <input class="checkbox checkbox-primary" type="checkbox" :id="channel" :value="channel"
+                    v-model="selectedChannels" />
+                  <span class="text-lg">{{ getChannelName(guild, channel) }} </span>
                 </label>
               </div>
             </template>

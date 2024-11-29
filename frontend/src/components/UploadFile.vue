@@ -40,7 +40,25 @@ const onFileChanged = async (event: Event) => {
 }
 
 const onSubmit = async () => {
-  if (!message.value || !fileData.value) return
+  if (!message.value && !fileData.value) return
+
+  const sendOnlyMessage = Boolean(message.value) && Boolean(!fileData.value)
+  if (sendOnlyMessage) {
+    console.log('message only')
+    await fetch(`${baseURL}/message`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ message: message.value, channels: props.targetChannels })
+    })
+    return
+  }
+
+  sendFile()
+}
+
+const sendFile = async () => {
   if (fileData.value && message.value) {
     fileData.value.append('message', JSON.stringify(message.value))
   } else if (!fileData.value && message.value) {
@@ -81,44 +99,22 @@ watch([() => message.value, () => fileData.value], ([messageValue, fileDataValue
     <AlertSuccess v-if="uploadSuccess" class="mb-4" message="Succesfully uploaded image" />
     <div>
       <form class="flex flex-col" enctype="multipart/form-data" @submit.prevent="onSubmit">
-        <input
-          v-model="message"
-          type="text"
-          class="input input-bordered w-full mb-4"
-          placeholder="Your message"
-        />
+        <input v-model="message" type="text" class="input input-bordered w-full mb-4" placeholder="Your message" />
 
-        <input
-          ref="inputRef"
-          class="file-input file-input-ghost file-input-bordered w-full"
-          :class="[!hasFileData ? 'text-rose-400' : '']"
-          type="file"
-          @change="onFileChanged"
-          accept="image/*,video/*"
-          capture
-        />
+        <input ref="inputRef" class="file-input file-input-ghost file-input-bordered w-full"
+          :class="[!hasFileData ? 'text-rose-400' : '']" type="file" @change="onFileChanged" accept="image/*,video/*"
+          capture />
 
         <Transition>
           <div class="my-4" v-if="previewFile">
-            <img
-              class="rounded-md max-h-96 w-auto mx-auto"
-              v-if="previewFile.type.includes('image')"
-              :src="previewLink"
-            />
-            <video
-              class="rounded-md max-h-96 w-auto mx-auto"
-              v-else
-              :src="previewLink"
-              controls
-            /></div
-        ></Transition>
+            <img class="rounded-md max-h-96 w-auto mx-auto" v-if="previewFile.type.includes('image')"
+              :src="previewLink" />
+            <video class="rounded-md max-h-96 w-auto mx-auto" v-else :src="previewLink" controls />
+          </div>
+        </Transition>
 
-        <button
-          type="submit"
-          class="btn btn-accent text-end mt-5"
-          :class="[!canSubmit ? 'btn-error' : '']"
-          :disabled="!canSubmit"
-        >
+        <button type="submit" class="btn btn-accent text-end mt-5" :class="[!canSubmit ? 'btn-error' : '']"
+          :disabled="!canSubmit">
           Submit
           <span v-if="isLoading" class="loading loading-spinner loading-xs"></span>
         </button>
@@ -131,6 +127,7 @@ watch([() => message.value, () => fileData.value], ([messageValue, fileDataValue
 .v-leave-active {
   transition: opacity 1s;
 }
+
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
