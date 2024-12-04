@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import SearchInput from '@/components/SearchInput.vue'
 import UploadFile from '@/components/UploadFile.vue'
-import PostMessage from '@/components/PostMessage.vue'
 import { getGuildFiles } from '@/services/getGuildFiles'
 import { onMounted, ref } from 'vue'
 import { areArraysDiff } from '@/utils/areArraysDiff'
@@ -42,7 +41,7 @@ const selectedChannels = ref<string[]>(localStorageItems.value)
 
 const guildsFiltered = computed<GuildType[]>(() => {
   const acc = [] as GuildType[]
-  const guilds = guildsArray.value.forEach((guild, index) => {
+  guildsArray.value.forEach((guild) => {
     const newChannels = guild.guild.channels.filter((channel) => {
       const channelName = getChannelName(guild, channel)
       return channelName?.includes(searchChannel.value)

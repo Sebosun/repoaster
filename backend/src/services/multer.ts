@@ -3,7 +3,7 @@ import path from "path";
 
 const storage = multer.diskStorage({
   destination: function (_, __, cb) {
-    cb(null, "/home/seb/Pictures/Images");
+    cb(null, "./Images");
   },
   filename: function (_, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);

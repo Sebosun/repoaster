@@ -1,7 +1,7 @@
 import winston from "winston";
 
 const logger = winston.createLogger({
-  level: "info", // Set the default log level (e.g., debug, info, warn, error)
+  level: "debug", // Set the default log level (e.g., debug, info, warn, error)
   format: winston.format.combine(
     winston.format.timestamp(), // Add timestamps to logs
     winston.format.json(), // Format logs in JSON format (optional)
