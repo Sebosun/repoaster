@@ -25,6 +25,13 @@ const hasFileData = computed(() => !!fileData.value)
 
 const canSubmit = computed(() => Boolean(hasFileData.value || message.value))
 
+const clearData = () => {
+  isLoading.value = false
+  message.value = ''
+  previewFile.value = undefined
+  if (inputRef.value) inputRef.value.value = ''
+}
+
 const onFileChanged = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const files = target.files
@@ -44,7 +51,6 @@ const onSubmit = async () => {
 
   const sendOnlyMessage = Boolean(message.value) && Boolean(!fileData.value)
   if (sendOnlyMessage) {
-    console.log('message only')
     await fetch(`${baseURL}/message`, {
       method: 'POST',
       headers: {
@@ -63,7 +69,7 @@ const sendFile = async () => {
     fileData.value.append('message', JSON.stringify(message.value))
   } else if (!fileData.value && message.value) {
     const tempFormData = new FormData()
-    tempFormData.append('message', JSON.stringify(message.value))
+    tempFormData.append('message', message.value)
     tempFormData.append('channels', JSON.stringify(props.targetChannels))
     fileData.value = tempFormData
   }
@@ -76,8 +82,7 @@ const sendFile = async () => {
       body: fileData.value
     })
     if (!response.ok) throw new Error('Failed to upload')
-    fileData.value = undefined
-    if (inputRef.value) inputRef.value.value = ''
+    clearData()
     uploadSuccess.value = true
   } catch (e) {
     console.error(e)
