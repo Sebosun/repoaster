@@ -21,7 +21,15 @@ export async function handleUploadImage(req: Request, res: Response) {
 
   try {
     const channels = JSON.parse(req.body.channels);
-    const message = JSON.parse(req.body.message) as string | undefined;
+    let message = req.body.message;
+    if (message) {
+      try {
+        message = JSON.parse(req.body.message)
+      } catch (e) {
+        throw new Error("Couldnt parse JSON message")
+      }
+    }
+
     const filePath = req.file?.path;
     const fileName = req.file?.filename;
     const hasFile = !!filePath && !!fileName;
@@ -32,7 +40,7 @@ export async function handleUploadImage(req: Request, res: Response) {
       } else if (hasFile) {
         await postMediaOnChannel(client, channel, filePath, fileName, message);
       }
-      await timeout(Math.floor(Math.random() * 1000));
+      await timeout(Math.floor(Math.random() * 431));
     }
   } catch (e) {
     console.error(e);
