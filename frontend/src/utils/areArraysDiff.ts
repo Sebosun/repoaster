@@ -1,5 +1,5 @@
-export const areArraysDiff = (arr1: any[], arr2: any[]) => {
-  if (arr1.length != arr2.length) return
+export const areArraysSame = (arr1: any[], arr2: any[]) => {
+  if (arr1.length != arr2.length) return false
   arr1.sort()
   arr2.sort()
 

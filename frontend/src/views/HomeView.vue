@@ -26,18 +26,19 @@ type GuildType = {
 const guildsArray = ref<GuildType[]>([])
 const searchChannel = ref('')
 
-const { localStorageItems, selectedChannels, saveCurrentChannels, areLocalItemsDiff, saveName } = useLocalStorage()
+const { localStorageItems, selectedChannels, saveCurrentChannels, areLocalItemsSame, saveName, selectedPreset, currentPreset } = useLocalStorage()
 
 const isInFavorites = (guild: GuildType): boolean => {
   return guild.channelsDetails.some((item) =>
-    localStorageItems.value.some((localGuild) => localGuild === item.id)
+    currentPreset.value?.channels.some(el => el === item.id)
   )
 }
 
 const favoriteCount = (guild: GuildType): number => {
   let count = 0
   guild.channelsDetails.forEach((item) => {
-    localStorageItems.value.forEach((localGuild) => {
+    if (!currentPreset.value) return
+    currentPreset.value?.channels.forEach((localGuild) => {
       if (item.id === localGuild) {
         count++
       }
@@ -130,6 +131,10 @@ onMounted(async () => {
     <SearchInput v-model="searchChannel" />
     <div class="grid grid-cols-2 p-8 gap-8 bg-gray-800 text-gray-200">
       <div>
+        <div>Selected preset: <span class="font-bold"> {{ selectedPreset }} </span> </div>
+        <button @click="selectedPreset = item.name" class="kbd" v-for="item in localStorageItems">
+          {{ item.name }}
+        </button>
         <div class="flex flex-wrap items-center gap-4">
           Sending to {{ selectedChannels.length }} channels:
           <div class="kbd" v-for="channel in getSelectedChannelsNames">
@@ -143,7 +148,7 @@ onMounted(async () => {
               v-model="saveName" />
           </label>
 
-          <button class="btn btn-sm" :disabled="areLocalItemsDiff" @click="saveCurrentChannels">
+          <button class="btn btn-sm" :disabled="areLocalItemsSame" @click="saveCurrentChannels">
             Save
           </button>
         </div>
