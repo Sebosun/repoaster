@@ -10,3 +10,17 @@ Both of the repos should have their own read with details how to launch them.
 
 Backend - Typescript, Express, Multer for handling image uploads, Zod
 Front - Vue 3 w/ typescript & composition api, tailwind using DaisyUI
+
+### TODOs
+- [ ] Paste image on frontend
+- [ ] Saving Presets for different scenarios (memes, animals etc)
+- [ ] Handle pasting instagram/yt link (check size)
+- [ ] List of sent images? With some reaction stats maybe?
+
+
+Further possible improvements: 
+- [ ] Support for multiple images/videos send at once
+
+User settings check:
+- [ ] if user has nitro or not etc. (upload size)
+- [ ] clearing local image
