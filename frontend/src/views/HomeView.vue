@@ -39,6 +39,25 @@ const getLocalChannels = () => {
 const localStorageItems = ref<string[]>(getLocalChannels() || [])
 const selectedChannels = ref<string[]>(localStorageItems.value)
 
+const isInFavorites = (guild: GuildType): boolean => {
+  return guild.channelsDetails.some((item) =>
+    localStorageItems.value.some((localGuild) => localGuild === item.id)
+  )
+}
+
+const favoriteCount = (guild: GuildType): number => {
+  let count = 0
+  guild.channelsDetails.forEach((item) => {
+    localStorageItems.value.forEach((localGuild) => {
+      if (item.id === localGuild) {
+        count++
+      }
+    })
+  })
+
+  return count
+}
+
 const guildsFiltered = computed<GuildType[]>(() => {
   const acc = [] as GuildType[]
   guildsArray.value.forEach((guild) => {
@@ -57,6 +76,27 @@ const guildsFiltered = computed<GuildType[]>(() => {
   if (searchChannel.value.length > 0) {
     acc.sort((_, second) => second.guild.channels.length)
   }
+
+  acc.sort((guild1, guild2) => {
+    const guild1InFavorites = isInFavorites(guild1)
+    const guild2InFavorites = isInFavorites(guild2)
+
+    if (guild1InFavorites && !guild2InFavorites) {
+      return -1
+    }
+
+    if (!guild1InFavorites && guild2InFavorites) {
+      return 1
+    }
+
+    if (guild1InFavorites && guild2InFavorites) {
+      const guild1Count = favoriteCount(guild1)
+      const guild2Count = favoriteCount(guild2)
+      return guild1Count > guild2Count ? -1 : 1
+    }
+
+    return -1
+  })
 
   return acc
 })
@@ -127,17 +167,23 @@ const getSelectedChannelsNames = computed(() =>
         <div v-if="guildsArray" class="collapse" v-for="guild in guildsFiltered">
           <input type="checkbox" />
 
-          <div class="collapse-title text-xl font-medium bg-base-200 rounded-md my-4">
+          <div class="collapse-title flex text-xl font-medium bg-base-200 rounded-md my-4 pr-6">
             {{ guild.guild.name }}
             <span class="opacity-50"> ({{ guild.guild.channels.length }}) </span>
+            <span class="ml-auto" v-if="isInFavorites(guild)"> ⭐ {{ favoriteCount(guild) }}</span>
           </div>
 
           <div class="collapse-content">
             <template v-for="channel in guild.guild.channels" :key="channel">
               <div v-if="getChannelName(guild, channel)">
                 <label class="label cursor-pointer">
-                  <input class="checkbox checkbox-primary" type="checkbox" :id="channel" :value="channel"
-                    v-model="selectedChannels" />
+                  <input
+                    class="checkbox checkbox-primary"
+                    type="checkbox"
+                    :id="channel"
+                    :value="channel"
+                    v-model="selectedChannels"
+                  />
                   <span class="text-lg">{{ getChannelName(guild, channel) }} </span>
                 </label>
               </div>
