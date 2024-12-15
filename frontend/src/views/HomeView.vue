@@ -2,9 +2,8 @@
 import SearchInput from '@/components/SearchInput.vue'
 import UploadFile from '@/components/UploadFile.vue'
 import { getGuildFiles } from '@/services/getGuildFiles'
-import { onMounted, ref } from 'vue'
-import { areArraysDiff } from '@/utils/areArraysDiff'
-import { computed } from '@vue/reactivity'
+import { onMounted, ref, computed } from 'vue'
+import { useLocalStorage } from '@/composables/useLocalStorage'
 
 type ChannelType = {
   id: string
@@ -27,17 +26,7 @@ type GuildType = {
 const guildsArray = ref<GuildType[]>([])
 const searchChannel = ref('')
 
-const getLocalChannels = () => {
-  try {
-    const channels = localStorage.getItem('channels')
-    if (channels) return JSON.parse(channels)
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-const localStorageItems = ref<string[]>(getLocalChannels() || [])
-const selectedChannels = ref<string[]>(localStorageItems.value)
+const { localStorageItems, selectedChannels, saveCurrentChannels, areLocalItemsDiff, saveName } = useLocalStorage()
 
 const isInFavorites = (guild: GuildType): boolean => {
   return guild.channelsDetails.some((item) =>
@@ -101,36 +90,12 @@ const guildsFiltered = computed<GuildType[]>(() => {
   return acc
 })
 
-onMounted(async () => {
-  try {
-    const items = await getGuildFiles()
-    const body = await items.json()
-    guildsArray.value = body
-  } catch (error) {
-    window.alert('Backend is not running (likely)')
-  }
-})
-
 const getChannelName = (guild: GuildType, channelId: string) => {
   const channels = guild?.channelsDetails
   const channelName = channels?.find((channel) => channel.id === channelId)?.name
 
   return channelName
 }
-
-const saveCurrentChannels = () => {
-  try {
-    /* TODO: notfis */
-    localStorageItems.value = selectedChannels.value
-    localStorage.setItem('channels', JSON.stringify(selectedChannels.value))
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-const areLocalItemsDiff = computed(() => {
-  return areArraysDiff(selectedChannels.value, localStorageItems.value)
-})
 
 const getSelectedChannelDetails = computed(() => {
   const acc = [] as ChannelType[]
@@ -148,6 +113,15 @@ const getSelectedChannelsNames = computed(() =>
   getSelectedChannelDetails.value.map((item) => item.name)
 )
 
+onMounted(async () => {
+  try {
+    const items = await getGuildFiles()
+    const body = await items.json()
+    guildsArray.value = body
+  } catch (error) {
+    window.alert('Backend is not running (likely)')
+  }
+})
 
 </script>
 
@@ -161,6 +135,14 @@ const getSelectedChannelsNames = computed(() =>
           <div class="kbd" v-for="channel in getSelectedChannelsNames">
             {{ channel }}
           </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <label class="input flex items-center gap-2 max-w-96 my-5">
+            <input type="text" class="grow bg-inherit input-bordered input-primary" placeholder="filter name"
+              v-model="saveName" />
+          </label>
+
           <button class="btn btn-sm" :disabled="areLocalItemsDiff" @click="saveCurrentChannels">
             Save
           </button>
