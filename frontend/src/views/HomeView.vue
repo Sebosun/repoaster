@@ -26,7 +26,7 @@ type GuildType = {
 const guildsArray = ref<GuildType[]>([])
 const searchChannel = ref('')
 
-const { localStorageItems, selectedChannels, saveCurrentChannels, areLocalItemsSame, saveName, selectedPreset, currentPreset } = useLocalStorage()
+const { localStorageItems, selectedChannels, savePreset, deletePreset, areLocalItemsSame, saveName, selectedPreset, currentPreset } = useLocalStorage()
 
 const isInFavorites = (guild: GuildType): boolean => {
   return guild.channelsDetails.some((item) =>
@@ -131,24 +131,24 @@ onMounted(async () => {
     <SearchInput v-model="searchChannel" />
     <div class="grid grid-cols-2 p-8 gap-8 bg-gray-800 text-gray-200">
       <div>
-        <div>Selected preset: <span class="font-bold"> {{ selectedPreset }} </span> </div>
-        <button @click="selectedPreset = item.name" class="kbd" v-for="item in localStorageItems">
-          {{ item.name }}
-        </button>
-        <div class="flex flex-wrap items-center gap-4">
-          Sending to {{ selectedChannels.length }} channels:
-          <div class="kbd" v-for="channel in getSelectedChannelsNames">
-            {{ channel }}
-          </div>
+        <div class="flex gap-4 items-center justify-between">
+          <div>Selected preset: <span class="font-bold"> {{ selectedPreset }} </span> </div>
+          <button class="btn btn-sm btn-outline btn-error" @click="deletePreset(selectedPreset)">Delete current
+            preset</button>
         </div>
-
+        <h1 class="font-bold text-xl mt-4">Presets</h1>
+        <div class="flex gap-4 my-4">
+          <button @click="selectedPreset = item.name" class="kbd" v-for="item in localStorageItems">
+            {{ item.name }}
+          </button>
+        </div>
         <div class="flex items-center gap-4">
           <label class="input flex items-center gap-2 max-w-96 my-5">
-            <input type="text" class="grow bg-inherit input-bordered input-primary" placeholder="filter name"
+            <input type="text" class="grow bg-inherit input-bordered input-primary" placeholder="Preset name"
               v-model="saveName" />
           </label>
 
-          <button class="btn btn-sm" :disabled="areLocalItemsSame" @click="saveCurrentChannels">
+          <button class="btn btn-info" :disabled="areLocalItemsSame" @click="savePreset">
             Save
           </button>
         </div>

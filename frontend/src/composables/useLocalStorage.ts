@@ -7,7 +7,7 @@ type PresetType = {
 }
 
 export const useLocalStorage = () => {
-  const saveCurrentChannels = () => {
+  const savePreset = () => {
     try {
       const newType = {
         name: saveName.value,
@@ -15,9 +15,7 @@ export const useLocalStorage = () => {
       }
 
       const localChannels = getLocalChannels()
-      console.log(localChannels)
       if (localChannels) {
-        // TODO: to sie wyjebie pewnie xD
         const channelsFiltered = localChannels.filter(item => item.name !== saveName.value)
         const combineLocal = [...channelsFiltered, newType]
         localStorage.setItem('presets', JSON.stringify(combineLocal))
@@ -31,6 +29,15 @@ export const useLocalStorage = () => {
     } catch (e) {
       console.error(e)
     }
+  }
+
+  const deletePreset = (presetName: string) => {
+    const localChannels = getLocalChannels()
+    if (!localChannels) return
+    const channelsFiltered = localChannels?.filter(item => item.name !== presetName)
+    localStorage.setItem('presets', JSON.stringify(channelsFiltered))
+    localStorageItems.value = channelsFiltered
+    selectedPreset.value = ''
   }
 
   const getLocalChannels = () => {
@@ -65,7 +72,8 @@ export const useLocalStorage = () => {
   })
 
   return {
-    saveCurrentChannels,
+    savePreset,
+    deletePreset,
     getLocalChannels,
     localStorageItems,
     currentPreset,
