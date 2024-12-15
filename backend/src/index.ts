@@ -1,7 +1,7 @@
 import "@/server";
 import "@/discordjs";
-import { ensureUploadFileExists } from "@/helpers/ensureUploadFileExists"
+import { ensureUploadFoldersExist } from "@/helpers/ensureUploadFileExists"
 
-ensureUploadFileExists()
+ensureUploadFoldersExist()
 
 

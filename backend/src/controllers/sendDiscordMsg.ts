@@ -3,7 +3,7 @@ import client from "@/discordjs";
 import { postMessageOnChannel } from "@/services/discord/postOnChannel";
 import { messageSchema } from "@/schemas/messageSchema";
 
-export async function handleSendDiscordMsg(req: Request, res: Response) {
+export async function sendDiscordMsg(req: Request, res: Response) {
   const input = messageSchema.safeParse(req.body);
   if (!input.success) {
     res.status(400);

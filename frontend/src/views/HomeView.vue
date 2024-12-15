@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import SearchInput from '@/components/SearchInput.vue'
 import UploadFile from '@/components/UploadFile.vue'
+import InstagramForm from '@/components/InstagramForm.vue'
 import { getGuildFiles } from '@/services/getGuildFiles'
 import { onMounted, ref, computed } from 'vue'
 import { useLocalStorage } from '@/composables/useLocalStorage'
@@ -23,14 +24,30 @@ type GuildType = {
   channelsDetails: ChannelType[]
 }
 
+type Options = {
+  type: 'message' | 'instagram'
+}
+
+const options = ref<Options>({
+  type: 'instagram'
+})
 const guildsArray = ref<GuildType[]>([])
 const searchChannel = ref('')
 
-const { localStorageItems, selectedChannels, savePreset, deletePreset, areLocalItemsSame, saveName, selectedPreset, currentPreset } = useLocalStorage()
+const {
+  localStorageItems,
+  selectedChannels,
+  savePreset,
+  deletePreset,
+  areLocalItemsSame,
+  saveName,
+  selectedPreset,
+  currentPreset
+} = useLocalStorage()
 
 const isInFavorites = (guild: GuildType): boolean => {
   return guild.channelsDetails.some((item) =>
-    currentPreset.value?.channels.some(el => el === item.id)
+    currentPreset.value?.channels.some((el) => el === item.id)
   )
 }
 
@@ -123,7 +140,6 @@ onMounted(async () => {
     window.alert('Backend is not running (likely)')
   }
 })
-
 </script>
 
 <template>
@@ -132,13 +148,18 @@ onMounted(async () => {
     <div class="grid grid-cols-2 p-8 gap-8 bg-gray-800 text-gray-200">
       <div>
         <div class="flex gap-4 items-center justify-between">
-          <div>Selected preset: <span class="font-bold"> {{ selectedPreset }} </span> </div>
-          <button class="btn btn-sm btn-outline btn-error" @click="deletePreset(selectedPreset)">Delete current
-            preset</button>
+          <div>
+            Selected preset: <span class="font-bold"> {{ selectedPreset }} </span>
+          </div>
+          <button class="btn btn-sm btn-outline btn-error" @click="deletePreset(selectedPreset)">
+            Delete current preset
+          </button>
         </div>
         <h1 class="font-bold text-xl mt-4">Presets</h1>
         <div class="flex gap-4 my-4">
-          <button @click="selectedPreset = item.name" class="kbd" v-for="item in localStorageItems">
+          <button @click="selectedPreset = ''" class="badge badge-warning">Reset</button>
+
+          <button @click="selectedPreset = item.name" class="badge badge-info" v-for="item in localStorageItems">
             {{ item.name }}
           </button>
         </div>
@@ -176,7 +197,22 @@ onMounted(async () => {
         </div>
       </div>
       <div>
-        <UploadFile :target-channels="selectedChannels" />
+        <div class="flex gap-4 justify-end">
+          <button @click="options.type = 'message'">Message/File</button>
+          <button @click="options.type = 'instagram'">Instagram</button>
+        </div>
+        <h1 class="text-4xl py-5 text-center">Repoast content</h1>
+        <UploadFile v-if="options.type === 'message'" :target-channels="selectedChannels" />
+
+        <InstagramForm v-else-if="options.type === 'instagram'" :target-channels="selectedChannels" />
+        <div class="mt-2">
+          Sending to channels
+          <div class="mt-2">
+            <span class="kbd kbd-sm ml-1" v-for="name in getSelectedChannelsNames" :key="name">
+              {{ name }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   </main>

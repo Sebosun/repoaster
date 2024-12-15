@@ -1,23 +1,24 @@
-import { existsSync, mkdir, PathLike } from "fs";
-import { homedir } from "os";
-import path from "path";
+import { existsSync, mkdir } from "fs";
+import { getUploadLocation, getInstagramLocation } from "@/helpers/uploadLocations"
 
-const home = homedir()
-
-export function ensureUploadFileExists(): void {
-  const uploadLocation = getUploadLocation()
-  if (existsSync(uploadLocation)) {
+function ensureUserFolderExists(location: string): void {
+  if (existsSync(location)) {
     return
   }
-  mkdir(getUploadLocation(), (err) => {
+  mkdir(location, (err) => {
     if (err) {
       console.error(err.message)
-      throw new Error("Couldnt make a directory")
+      throw new Error(`Couldnt make a directory ${location}`)
     }
     console.log("Succesfully made initial upload directory")
   })
 }
 
-export function getUploadLocation(): string {
-  return path.join(home, ".local", 'share', 'upload')
+
+export function ensureUploadFoldersExist(): void {
+  const instagramLocation = getInstagramLocation()
+  const imageUploadLocation = getUploadLocation()
+  ensureUserFolderExists(imageUploadLocation)
+  ensureUserFolderExists(instagramLocation)
 }
+

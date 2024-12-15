@@ -51,7 +51,7 @@ const onFileChanged = async (event: Event) => {
   applyNewFile(files[0])
 }
 
-const onSubmit = async () => {
+const submit = async () => {
   if (!message.value && !fileData.value) return
 
   const sendOnlyMessage = Boolean(message.value) && Boolean(!fileData.value)
@@ -103,21 +103,20 @@ watch([() => message.value, () => fileData.value], ([messageValue, fileDataValue
 })
 
 const handlePaste = (event: ClipboardEvent) => {
-  const items = event.clipboardData?.items;
+  const items = event.clipboardData?.items
   if (!items) return
   const file = items[0].getAsFile()
   if (!file) return
+
   applyNewFile(file)
 }
 </script>
 
-
 <template>
   <section @paste="handlePaste">
-    <h1 class="text-4xl py-5 text-center">Repoast content</h1>
     <AlertSuccess v-if="uploadSuccess" class="mb-4" message="Succesfully uploaded image" />
     <div>
-      <form class="flex flex-col" enctype="multipart/form-data" @submit.prevent="onSubmit">
+      <form class="flex flex-col" enctype="multipart/form-data" @submit.prevent="submit">
         <input v-model="message" type="text" class="input input-bordered w-full mb-4" placeholder="Your message" />
 
         <input ref="inputRef" class="file-input file-input-ghost file-input-bordered w-full"

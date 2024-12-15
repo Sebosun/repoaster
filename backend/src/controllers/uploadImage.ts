@@ -6,7 +6,7 @@ import {
 } from "../services/discord/postOnChannel";
 import { timeout } from "@/helpers/timeout";
 
-export async function handleUploadImage(req: Request, res: Response) {
+export async function uploadImage(req: Request, res: Response) {
   if (!req.file && !req.body.message) {
     res.status(400);
     res.json({ message: "Missing file or message" });
