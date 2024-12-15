@@ -147,6 +147,8 @@ const getSelectedChannelDetails = computed(() => {
 const getSelectedChannelsNames = computed(() =>
   getSelectedChannelDetails.value.map((item) => item.name)
 )
+
+
 </script>
 
 <template>
@@ -154,7 +156,7 @@ const getSelectedChannelsNames = computed(() =>
     <SearchInput v-model="searchChannel" />
     <div class="grid grid-cols-2 p-8 gap-8 bg-gray-800 text-gray-200">
       <div>
-        <div class="flex flex-wrap items-center gap-4" v-if="selectedChannels?.length">
+        <div class="flex flex-wrap items-center gap-4">
           Sending to {{ selectedChannels.length }} channels:
           <div class="kbd" v-for="channel in getSelectedChannelsNames">
             {{ channel }}
@@ -177,13 +179,8 @@ const getSelectedChannelsNames = computed(() =>
             <template v-for="channel in guild.guild.channels" :key="channel">
               <div v-if="getChannelName(guild, channel)">
                 <label class="label cursor-pointer">
-                  <input
-                    class="checkbox checkbox-primary"
-                    type="checkbox"
-                    :id="channel"
-                    :value="channel"
-                    v-model="selectedChannels"
-                  />
+                  <input class="checkbox checkbox-primary" type="checkbox" :id="channel" :value="channel"
+                    v-model="selectedChannels" />
                   <span class="text-lg">{{ getChannelName(guild, channel) }} </span>
                 </label>
               </div>

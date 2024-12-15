@@ -32,18 +32,23 @@ const clearData = () => {
   if (inputRef.value) inputRef.value.value = ''
 }
 
+const applyNewFile = (newFile: File): void => {
+  const tempFormData = new FormData()
+  previewFile.value = newFile
+  tempFormData.append('image', newFile)
+  tempFormData.append('channels', JSON.stringify(props.targetChannels))
+  fileData.value = tempFormData
+}
+
 const onFileChanged = async (event: Event) => {
   const target = event.target as HTMLInputElement
   const files = target.files
+
   if (!files || files.length < 0) {
     console.error('Missing file')
     return
   }
-  const tempFormData = new FormData()
-  previewFile.value = files[0]
-  tempFormData.append('image', files[0])
-  tempFormData.append('channels', JSON.stringify(props.targetChannels))
-  fileData.value = tempFormData
+  applyNewFile(files[0])
 }
 
 const onSubmit = async () => {
@@ -96,10 +101,19 @@ watch([() => message.value, () => fileData.value], ([messageValue, fileDataValue
     uploadSuccess.value = false
   }
 })
+
+const handlePaste = (event: ClipboardEvent) => {
+  const items = event.clipboardData?.items;
+  if (!items) return
+  const file = items[0].getAsFile()
+  if (!file) return
+  applyNewFile(file)
+}
 </script>
 
+
 <template>
-  <section>
+  <section @paste="handlePaste">
     <h1 class="text-4xl py-5 text-center">Repoast content</h1>
     <AlertSuccess v-if="uploadSuccess" class="mb-4" message="Succesfully uploaded image" />
     <div>
