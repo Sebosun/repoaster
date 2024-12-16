@@ -11,10 +11,10 @@ const testGuild = process.env.TEST_GUILD;
 if (!token) throw new Error("No token");
 if (!testGuild) throw new Error("No test guild");
 
+client.login(token);
+
 client.on("ready", async () => {
   console.log("Bot is ready");
 });
-
-client.login(token);
 
 export default client;

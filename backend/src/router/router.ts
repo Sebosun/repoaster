@@ -3,7 +3,7 @@ import { upload } from "@/services/multer";
 import { uploadImage } from "@/controllers/uploadImage";
 import { sendDiscordMsg } from "@/controllers/sendDiscordMsg";
 import { handleGetDiscordChannels } from "@/controllers/getDiscordChannels";
-import { sendInstagram } from "@/controllers/sendInstagram";
+import { sendYTDLP } from "@/controllers/sendYTDLP";
 
 const router = Router();
 
@@ -11,7 +11,7 @@ const router = Router();
 // I don't like manually checking it lol - zod?
 router.post("/upload", upload.single("image"), uploadImage);
 router.post("/message", sendDiscordMsg);
-router.post("/instagram", sendInstagram)
+router.post("/ytdlp", sendYTDLP)
 router.use("/channels", handleGetDiscordChannels);
 
 export default router;

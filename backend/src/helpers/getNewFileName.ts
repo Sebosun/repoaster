@@ -16,3 +16,15 @@ export function getNewFileName(): string {
 
   return `${newName + 1}`
 }
+
+export function findNewestFile(): string {
+  const result = readdirSync(getInstagramLocation())
+  const sorted = result.sort((x, y) => {
+    const xBaseName = Number(path.parse(x).name)
+    const yBaseName = Number(path.parse(y).name)
+    return xBaseName > yBaseName ? 1 : -1
+  })
+  return sorted[sorted.length - 1]
+}
+
+
