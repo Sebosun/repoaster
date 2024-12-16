@@ -25,11 +25,11 @@ type GuildType = {
 }
 
 type Options = {
-  type: 'message' | 'instagram'
+  type: 'message' | 'ytdlp'
 }
 
 const options = ref<Options>({
-  type: 'instagram'
+  type: 'ytdlp'
 })
 const guildsArray = ref<GuildType[]>([])
 const searchChannel = ref('')
@@ -156,7 +156,7 @@ onMounted(async () => {
           </button>
         </div>
         <h1 class="font-bold text-xl mt-4">Presets</h1>
-        <div class="flex gap-4 my-4">
+        <div class="flex flex-wrap gap-4 my-4">
           <button @click="selectedPreset = ''" class="badge badge-warning">Reset</button>
 
           <button @click="selectedPreset = item.name" class="badge badge-info" v-for="item in localStorageItems">
@@ -198,13 +198,15 @@ onMounted(async () => {
       </div>
       <div>
         <div class="flex gap-4 justify-end">
-          <button @click="options.type = 'message'">Message/File</button>
-          <button @click="options.type = 'instagram'">Instagram</button>
+          <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'message' }"
+            @click="options.type = 'message'">Message/File</button>
+          <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'ytdlp' }"
+            @click="options.type = 'ytdlp'">ytdlp</button>
         </div>
         <h1 class="text-4xl py-5 text-center">Repoast content</h1>
         <UploadFile v-if="options.type === 'message'" :target-channels="selectedChannels" />
 
-        <InstagramForm v-else-if="options.type === 'instagram'" :target-channels="selectedChannels" />
+        <InstagramForm v-else-if="options.type === 'ytdlp'" :target-channels="selectedChannels" />
         <div class="mt-2">
           Sending to channels
           <div class="mt-2">

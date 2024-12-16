@@ -20,7 +20,7 @@ const submit = async () => {
   uploadError.value = false
   try {
     isLoading.value = true
-    const response = await fetch(`${baseURL}/instagram`, {
+    const response = await fetch(`${baseURL}/ytdlp`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
