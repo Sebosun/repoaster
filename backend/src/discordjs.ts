@@ -1,5 +1,6 @@
 import { Client } from "discord.js-selfbot-v13";
 import dotenv from "dotenv";
+import { parseMessage } from '@/controllers/discordjs/parseMessage'
 
 dotenv.config();
 
@@ -17,4 +18,7 @@ client.on("ready", async () => {
   console.log("Bot is ready");
 });
 
+client.on('messageCreate', (message) =>
+  parseMessage(message, client)
+)
 export default client;
