@@ -5,6 +5,7 @@ import { sendDiscordMsg } from "@/controllers/sendDiscordMsg";
 import { handleGetDiscordChannels } from "@/controllers/getDiscordChannels";
 import { sendYTDLP } from "@/controllers/sendYTDLP";
 import { getPresets, savePresets } from "@/controllers/presets"
+import { repoastReel } from "@/controllers/repoastReel";
 
 const router = Router();
 
@@ -15,7 +16,10 @@ router.post("/presets", savePresets);
 
 router.post("/upload", upload.single("image"), uploadImage);
 router.post("/message", sendDiscordMsg);
+
 router.post("/ytdlp", sendYTDLP)
 router.use("/channels", handleGetDiscordChannels);
+
+router.use("/repoast/reel", repoastReel)
 
 export default router;
