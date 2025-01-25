@@ -13,12 +13,12 @@ app.use(cors());
 
 // TODO: get some better logging
 app.use((req, _, next) => {
-  logger.info("New request received:", req.method, req.url, req.body);
-  next();
+    logger.info("New request received:", req.method, req.url, req.body);
+    next();
 });
 
 app.use("/", router);
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });
