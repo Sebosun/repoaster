@@ -6,8 +6,6 @@ import { ytdlp } from '@/helpers/ytdlp'
 import { postMediaOnChannel } from "@/services/discord/postOnChannel";
 import { timeout } from "@/helpers/timeout";
 
-const default_preset = "test"
-
 export async function repoastReel(req: Request, res: Response) {
     // TODO: add preset to schema
     const input = repoastSchema.safeParse(req.body);
@@ -18,12 +16,12 @@ export async function repoastReel(req: Request, res: Response) {
         return;
     }
 
-    const { link } = input.data
+    const { link, preset } = input.data
 
     let channels
 
     try {
-        channels = await getPresetByName(default_preset)
+        channels = await getPresetByName(preset)
     } catch (e) {
         console.error(e)
         res.status(500);
