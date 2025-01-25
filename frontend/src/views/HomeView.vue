@@ -5,6 +5,7 @@ import InstagramForm from '@/components/InstagramForm.vue'
 import { getGuildFiles } from '@/services/getGuildFiles'
 import { onMounted, ref, computed } from 'vue'
 import { useLocalStorage } from '@/composables/useLocalStorage'
+import { API_savePresets } from '@/api/presets'
 
 type ChannelType = {
   id: string
@@ -44,6 +45,26 @@ const {
   selectedPreset,
   currentPreset
 } = useLocalStorage()
+
+const savePresetBackend = async () => {
+  if (!currentPreset.value) return
+  console.log(currentPreset.value)
+  try {
+    await API_savePresets(localStorageItems.value)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+onMounted(async () => {
+  try {
+    const items = await getGuildFiles()
+    const body = await items.json()
+    guildsArray.value = body
+  } catch (error) {
+    window.alert('Backend is not running (likely)')
+  }
+})
 
 const isInFavorites = (guild: GuildType): boolean => {
   return guild.channelsDetails.some((item) =>
@@ -130,16 +151,6 @@ const getSelectedChannelDetails = computed(() => {
 const getSelectedChannelsNames = computed(() =>
   getSelectedChannelDetails.value.map((item) => item.name)
 )
-
-onMounted(async () => {
-  try {
-    const items = await getGuildFiles()
-    const body = await items.json()
-    guildsArray.value = body
-  } catch (error) {
-    window.alert('Backend is not running (likely)')
-  }
-})
 </script>
 
 <template>
@@ -159,18 +170,30 @@ onMounted(async () => {
         <div class="flex flex-wrap gap-4 my-4">
           <button @click="selectedPreset = ''" class="badge badge-warning">Reset</button>
 
-          <button @click="selectedPreset = item.name" class="badge badge-info" v-for="item in localStorageItems">
+          <button
+            @click="selectedPreset = item.name"
+            class="badge badge-info"
+            v-for="item in localStorageItems"
+          >
             {{ item.name }}
           </button>
         </div>
         <div class="flex items-center gap-4">
           <label class="input flex items-center gap-2 max-w-96 my-5">
-            <input type="text" class="grow bg-inherit input-bordered input-primary" placeholder="Preset name"
-              v-model="saveName" />
+            <input
+              type="text"
+              class="grow bg-inherit input-bordered input-primary"
+              placeholder="Preset name"
+              v-model="saveName"
+            />
           </label>
 
           <button class="btn btn-info" :disabled="areLocalItemsSame" @click="savePreset">
             Save
+          </button>
+
+          <button class="btn btn-info" :disabled="areLocalItemsSame" @click="savePresetBackend">
+            Save Preset On The Backend
           </button>
         </div>
 
@@ -187,8 +210,13 @@ onMounted(async () => {
             <template v-for="channel in guild.guild.channels" :key="channel">
               <div v-if="getChannelName(guild, channel)">
                 <label class="label cursor-pointer">
-                  <input class="checkbox checkbox-primary" type="checkbox" :id="channel" :value="channel"
-                    v-model="selectedChannels" />
+                  <input
+                    class="checkbox checkbox-primary"
+                    type="checkbox"
+                    :id="channel"
+                    :value="channel"
+                    v-model="selectedChannels"
+                  />
                   <span class="text-lg">{{ getChannelName(guild, channel) }} </span>
                 </label>
               </div>
@@ -198,10 +226,20 @@ onMounted(async () => {
       </div>
       <div>
         <div class="flex gap-4 justify-end">
-          <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'message' }"
-            @click="options.type = 'message'">Message/File</button>
-          <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'ytdlp' }"
-            @click="options.type = 'ytdlp'">ytdlp</button>
+          <button
+            class="btn btn-sm"
+            :class="{ 'btn-accent': options.type === 'message' }"
+            @click="options.type = 'message'"
+          >
+            Message/File
+          </button>
+          <button
+            class="btn btn-sm"
+            :class="{ 'btn-accent': options.type === 'ytdlp' }"
+            @click="options.type = 'ytdlp'"
+          >
+            ytdlp
+          </button>
         </div>
         <h1 class="text-4xl py-5 text-center">Repoast content</h1>
         <UploadFile v-if="options.type === 'message'" :target-channels="selectedChannels" />
