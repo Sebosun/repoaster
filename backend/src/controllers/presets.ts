@@ -26,7 +26,7 @@ export async function savePresets(req: Request, res: Response) {
         return;
     }
 
-    const { name, channels } = input.data
+    const { data } = input
 
 
     try {
@@ -34,7 +34,11 @@ export async function savePresets(req: Request, res: Response) {
 
         if (!settings.presets) settings.presets = {}
 
-        settings.presets[name] = channels
+        data.forEach(el => {
+            if (settings.presets) {
+                settings.presets[el.name] = el.channels
+            }
+        })
 
         const new_saved_items = JSON.stringify(settings)
 
