@@ -2,10 +2,10 @@ import { Request, Response } from "express";
 import { presetSchema } from "@/schemas/presetSchema";
 import path from "path";
 import { writeFile } from 'node:fs/promises'
-import { getSettings } from '@/helpers/getSettings'
+import { getSettings, updateSettings } from '@/helpers/useSettings'
+import { getUserDataLocation } from "@/helpers/useLocations";
 
-
-const savedDataPath = path.resolve(__dirname, "../saved_data.json")
+const savedDataPath = getUserDataLocation()
 
 export async function getPresets(_: Request, res: Response) {
     try {
@@ -30,22 +30,18 @@ export async function savePresets(req: Request, res: Response) {
 
 
     try {
-        const settings = await getSettings()
-
-        if (!settings.presets) settings.presets = {}
+        let newPresets = {
+            presets: {}
+        } as Record<string, Record<string, string[]>>
 
         data.forEach(el => {
-            if (settings.presets) {
-                settings.presets[el.name] = el.channels
-            }
+            newPresets.presets[el.name] = el.channels
         })
 
-        const new_saved_items = JSON.stringify(settings)
-
-        await writeFile(savedDataPath, new_saved_items)
+        const newSettings = await updateSettings(newPresets)
 
         res.status(200);
-        res.json(settings.presets);
+        res.json(newSettings.presets);
 
     } catch (e) {
         console.error(e)

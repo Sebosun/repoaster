@@ -15,4 +15,4 @@ import { RouterView } from 'vue-router'
   border-radius: 0;
   border-bottom: 2px solid #fff;
 }
-</style
+</style>

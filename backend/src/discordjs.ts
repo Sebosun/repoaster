@@ -15,10 +15,10 @@ if (!testGuild) throw new Error("No test guild");
 client.login(token);
 
 client.on("ready", async () => {
-  console.log("Bot is ready");
+    console.log("Bot is ready");
 });
 
 client.on('messageCreate', (message) =>
-  parseMessage(message, client)
+    parseMessage(message, client)
 )
 export default client;

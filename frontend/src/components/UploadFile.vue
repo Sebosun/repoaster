@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed } from '@vue/reactivity'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import AlertSuccess from '@/components/alerts/AlertSuccess.vue'
 
 const props = defineProps<{

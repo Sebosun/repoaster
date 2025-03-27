@@ -1,7 +1,7 @@
 import client from "@/discordjs";
 import { Request, Response } from "express";
 import { repoastSchema } from '@/schemas/repoastSchema'
-import { getPresetByName } from "@/helpers/getSettings";
+import { getPresetByName } from "@/helpers/useSettings";
 import { ytdlp } from '@/helpers/ytdlp'
 import { postMediaOnChannel } from "@/services/discord/postOnChannel";
 import { timeout } from "@/helpers/timeout";
@@ -56,5 +56,4 @@ export async function repoastReel(req: Request, res: Response) {
             return
         }
     })
-
 }
