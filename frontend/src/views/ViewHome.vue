@@ -6,24 +6,7 @@ import { getGuildFiles } from '@/services/getGuildFiles'
 import { onMounted, ref, computed } from 'vue'
 import { useLocalStorage } from '@/composables/useLocalStorage'
 import { API_savePresets } from '@/api/presets'
-
-type ChannelType = {
-  id: string
-  name: string
-  type: string
-}
-
-type GuildType = {
-  guild: {
-    id: string
-    name: string
-    icon?: string
-    channels: string[]
-    files: string[]
-  }
-
-  channelsDetails: ChannelType[]
-}
+import type { GuildType, ChannelType } from '@/types/GuildTypes'
 
 type Options = {
   type: 'message' | 'ytdlp'
@@ -56,23 +39,13 @@ const savePresetBackend = async () => {
   }
 }
 
-onMounted(async () => {
-  try {
-    const items = await getGuildFiles()
-    const body = await items.json()
-    guildsArray.value = body
-  } catch (error) {
-    window.alert('Backend is not running (likely)')
-  }
-})
-
-const isInFavorites = (guild: GuildType): boolean => {
+const isInPreset = (guild: GuildType): boolean => {
   return guild.channelsDetails.some((item) =>
     currentPreset.value?.channels.some((el) => el === item.id)
   )
 }
 
-const favoriteCount = (guild: GuildType): number => {
+const selectedCount = (guild: GuildType): number => {
   let count = 0
   guild.channelsDetails.forEach((item) => {
     if (!currentPreset.value) return
@@ -106,8 +79,8 @@ const guildsFiltered = computed<GuildType[]>(() => {
   }
 
   acc.sort((guild1, guild2) => {
-    const guild1InFavorites = isInFavorites(guild1)
-    const guild2InFavorites = isInFavorites(guild2)
+    const guild1InFavorites = isInPreset(guild1)
+    const guild2InFavorites = isInPreset(guild2)
 
     if (guild1InFavorites && !guild2InFavorites) {
       return -1
@@ -118,8 +91,8 @@ const guildsFiltered = computed<GuildType[]>(() => {
     }
 
     if (guild1InFavorites && guild2InFavorites) {
-      const guild1Count = favoriteCount(guild1)
-      const guild2Count = favoriteCount(guild2)
+      const guild1Count = selectedCount(guild1)
+      const guild2Count = selectedCount(guild2)
       return guild1Count > guild2Count ? -1 : 1
     }
 
@@ -151,14 +124,23 @@ const getSelectedChannelDetails = computed(() => {
 const getSelectedChannelsNames = computed(() =>
   getSelectedChannelDetails.value.map((item) => item.name)
 )
+
+onMounted(async () => {
+  try {
+    const items = await getGuildFiles()
+    const body = await items.json()
+    guildsArray.value = body
+  } catch (error) {
+    window.alert('Backend is not running (likely)')
+  }
+})
 </script>
 
 <template>
   <main class="text-white mx-auto min-w-96 w-full">
-    <SearchInput v-model="searchChannel" />
     <div class="grid grid-cols-2 p-8 gap-8 bg-gray-800 text-gray-200">
       <div>
-        <div class="flex gap-4 items-center justify-between">
+        <div class="mt-4 flex gap-4 items-center justify-between">
           <div>
             Selected preset: <span class="font-bold"> {{ selectedPreset }} </span>
           </div>
@@ -170,22 +152,15 @@ const getSelectedChannelsNames = computed(() =>
         <div class="flex flex-wrap gap-4 my-4">
           <button @click="selectedPreset = ''" class="badge badge-warning">Reset</button>
 
-          <button
-            @click="selectedPreset = item.name"
-            class="badge badge-info"
-            v-for="item in localStorageItems"
-          >
+          <button @click="selectedPreset = item.name" class="badge badge-info" v-for="item in localStorageItems"
+            :key="item.name">
             {{ item.name }}
           </button>
         </div>
         <div class="flex items-center gap-4">
           <label class="input flex items-center gap-2 max-w-96 my-5">
-            <input
-              type="text"
-              class="grow bg-inherit input-bordered input-primary"
-              placeholder="Preset name"
-              v-model="saveName"
-            />
+            <input type="text" class="grow bg-inherit input-bordered input-primary" placeholder="Preset name"
+              v-model="saveName" />
           </label>
 
           <button class="btn btn-info" :disabled="areLocalItemsSame" @click="savePreset">
@@ -197,47 +172,40 @@ const getSelectedChannelsNames = computed(() =>
           </button>
         </div>
 
-        <div v-if="guildsArray" class="collapse" v-for="guild in guildsFiltered">
-          <input type="checkbox" />
+        <SearchInput v-model="searchChannel" />
 
-          <div class="collapse-title flex text-xl font-medium bg-base-200 rounded-md my-4 pr-6">
-            {{ guild.guild.name }}
-            <span class="opacity-50"> ({{ guild.guild.channels.length }}) </span>
-            <span class="ml-auto" v-if="isInFavorites(guild)"> ⭐ {{ favoriteCount(guild) }}</span>
-          </div>
+        <template v-if="guildsArray">
+          <div class="collapse" v-for="guild in guildsFiltered" :key="guild.guild.id">
+            <input type="checkbox" />
 
-          <div class="collapse-content">
-            <template v-for="channel in guild.guild.channels" :key="channel">
-              <div v-if="getChannelName(guild, channel)">
-                <label class="label cursor-pointer">
-                  <input
-                    class="checkbox checkbox-primary"
-                    type="checkbox"
-                    :id="channel"
-                    :value="channel"
-                    v-model="selectedChannels"
-                  />
-                  <span class="text-lg">{{ getChannelName(guild, channel) }} </span>
-                </label>
-              </div>
-            </template>
+            <div class="collapse-title flex text-xl font-medium bg-base-200 rounded-md my-4 pr-6">
+              {{ guild.guild.name }}
+              <span class="opacity-50"> ({{ guild.guild.channels.length }}) </span>
+              <span class="ml-auto" v-if="isInPreset(guild)"> ⭐ {{ selectedCount(guild) }}</span>
+            </div>
+
+            <div class="collapse-content">
+              <template v-for="channel in guild.guild.channels" :key="channel">
+                <div v-if="getChannelName(guild, channel)">
+                  <label class="label cursor-pointer">
+                    <input class="checkbox checkbox-primary" type="checkbox" :id="channel" :value="channel"
+                      v-model="selectedChannels" />
+                    <span class="text-lg">{{ getChannelName(guild, channel) }} </span>
+                  </label>
+                </div>
+              </template>
+            </div>
           </div>
-        </div>
+        </template>
       </div>
       <div>
         <div class="flex gap-4 justify-end">
-          <button
-            class="btn btn-sm"
-            :class="{ 'btn-accent': options.type === 'message' }"
-            @click="options.type = 'message'"
-          >
+          <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'message' }"
+            @click="options.type = 'message'">
             Message/File
           </button>
-          <button
-            class="btn btn-sm"
-            :class="{ 'btn-accent': options.type === 'ytdlp' }"
-            @click="options.type = 'ytdlp'"
-          >
+          <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'ytdlp' }"
+            @click="options.type = 'ytdlp'">
             ytdlp
           </button>
         </div>

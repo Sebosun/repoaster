@@ -5,7 +5,7 @@ import { RouterView } from 'vue-router'
 <template>
   <nav class="navbar bg-base-100">
     <RouterLink class="btn btn-ghost text-xl" to="/"> Main </RouterLink>
-    <RouterLink class="btn btn-ghost text-xl" to="/post-message">Post message</RouterLink>
+    <RouterLink class="btn btn-ghost text-xl" to="/repoast">Repoast settings</RouterLink>
   </nav>
   <RouterView />
 </template>

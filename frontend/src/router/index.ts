@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
+import ViewHome from '@/views/ViewHome.vue'
+import ViewRepoast from '@/views/ViewRepoast.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,12 +8,12 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView
+      component: ViewHome
     },
     {
-      path: '/post-message',
-      name: 'post-message',
-      component: () => import('@/views/PostMessageView.vue')
+      path: '/repoast',
+      name: 'repoast',
+      component: ViewRepoast
     }
   ]
 })

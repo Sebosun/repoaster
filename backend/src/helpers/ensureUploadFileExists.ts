@@ -1,15 +1,16 @@
-import { existsSync, mkdir, writeFile } from "fs";
+import { existsSync, writeFile } from "fs";
+import { mkdir } from "node:fs/promises";
 import { getUploadLocation, getInstagramLocation, getUserDataLocation } from "@/helpers/useLocations"
 
-function ensureUserFolderExists(location: string): void {
+async function ensureUserFolderExists(location: string): Promise<void> {
     if (existsSync(location)) return
-    mkdir(location, (err) => {
-        if (err) {
-            console.error(err.message)
-            throw new Error(`Couldnt make a directory ${location}`)
-        }
-        console.log("Succesfully made initial upload directory")
-    })
+    try {
+        await mkdir(location)
+        console.log(`Succesfully made folder ${location}`)
+    } catch (e) {
+        console.error(e)
+        throw new Error(`Couldn't make a directory ${location}`)
+    }
 }
 
 function ensureUserDataFileExists(): void {
@@ -28,11 +29,13 @@ function ensureUserDataFileExists(): void {
     })
 }
 
-export function ensureUploadFoldersExist(): void {
+export async function ensureUploadFoldersExist(): Promise<void> {
     const imageUploadLocation = getUploadLocation()
     const instagramLocation = getInstagramLocation()
-    ensureUserFolderExists(imageUploadLocation)
-    ensureUserFolderExists(instagramLocation)
-    ensureUserDataFileExists()
+    // Those throws - and they should break the app if they're broken
+    ensureUserFolderExists(imageUploadLocation).then(() => {
+        ensureUserFolderExists(instagramLocation)
+        ensureUserDataFileExists()
+    })
 }
 
