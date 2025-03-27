@@ -1,6 +1,7 @@
 import { Client } from "discord.js-selfbot-v13";
 import dotenv from "dotenv";
-import { parseMessage } from '@/controllers/discordjs/parseMessage'
+import { parseSelfCommand } from '@/controllers/discordjs/parseSelfCommand'
+import { channelRepoast } from '@/controllers/discordjs/channelRepoast'
 
 dotenv.config();
 
@@ -18,7 +19,13 @@ client.on("ready", async () => {
     console.log("Bot is ready");
 });
 
-client.on('messageCreate', (message) =>
-    parseMessage(message, client)
-)
+const chId = '1354834396879913041'
+
+client.on('messageCreate', (message) => {
+    if (chId === message.channelId) {
+        channelRepoast(message, client)
+    }
+    parseSelfCommand(message, client)
+})
+
 export default client;

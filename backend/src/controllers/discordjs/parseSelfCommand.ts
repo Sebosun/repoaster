@@ -1,4 +1,4 @@
-import { AnyChannel, Client, Message } from 'discord.js-selfbot-v13'
+import { Client, Message } from 'discord.js-selfbot-v13'
 import { prepareMessageData } from '@/helpers/discordjs/prepareMessage'
 
 type OptionsType = {
@@ -9,13 +9,13 @@ type OptionsType = {
     message?: string
 }
 
-
-
-export const parseMessage = async (
+// 2025-03-27
+// This doesn't work properly
+// Leaving it be, but it isn't being used
+export const parseSelfCommand = async (
     discordMessage: Message<boolean>,
     client: Client<boolean>,
 ) => {
-
     const options: OptionsType = {
         command: undefined,
         mode: undefined,
