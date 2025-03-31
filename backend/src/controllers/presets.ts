@@ -1,19 +1,15 @@
 import { Request, Response } from "express";
 import { presetSchema } from "@/schemas/presetSchema";
-import path from "path";
-import { writeFile } from 'node:fs/promises'
 import { getSettings, updateSettings } from '@/helpers/useSettings'
-import { getUserDataLocation } from "@/helpers/useLocations";
-
-const savedDataPath = getUserDataLocation()
+import { STATUS_CODES } from '@/types/ResponseTypes'
 
 export async function getPresets(_: Request, res: Response) {
     try {
         const settings = await getSettings()
-        res.status(200);
+        res.status(STATUS_CODES.OK);
         res.json(settings.presets);
     } catch (e) {
-        res.status(500);
+        res.status(STATUS_CODES.SERVER_ERROR);
         res.json({ message: "Error parsing JSON data" });
     }
 }
@@ -21,13 +17,12 @@ export async function getPresets(_: Request, res: Response) {
 export async function savePresets(req: Request, res: Response) {
     const input = presetSchema.safeParse(req.body);
     if (!input.success) {
-        res.status(400);
+        res.status(STATUS_CODES.INVALID_REQUEST);
         res.json({ message: "Invalid input" });
         return;
     }
 
     const { data } = input
-
 
     try {
         let newPresets = {
@@ -40,12 +35,12 @@ export async function savePresets(req: Request, res: Response) {
 
         const newSettings = await updateSettings(newPresets)
 
-        res.status(200);
+        res.status(STATUS_CODES.INVALID_REQUEST);
         res.json(newSettings.presets);
 
     } catch (e) {
         console.error(e)
-        res.status(500);
+        res.status(STATUS_CODES.SERVER_ERROR);
         res.json({ message: "Error parsing JSON data" });
     }
 }

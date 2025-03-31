@@ -3,6 +3,7 @@ import { getUserDataLocation } from "@/helpers/useLocations";
 
 export interface SaveData {
     presets?: Record<string, string[]>
+    repostChannels?: string[]
 }
 
 const savedDataPath = getUserDataLocation()
@@ -20,6 +21,7 @@ export async function updateSettings(newSettings: Partial<SaveData>) {
     try {
         const settings = await getSettings()
         if (newSettings.presets) settings.presets = newSettings.presets
+        if (newSettings.repostChannels) settings.repostChannels = newSettings.repostChannels
 
         const new_saved_items = JSON.stringify(settings)
         await writeFile(savedDataPath, new_saved_items)
