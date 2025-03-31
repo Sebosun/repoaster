@@ -5,13 +5,14 @@ import { getPresetByName } from "@/helpers/useSettings";
 import { ytdlp } from '@/helpers/ytdlp'
 import { postMediaOnChannel } from "@/services/discord/postOnChannel";
 import { timeout } from "@/helpers/timeout";
+import { STATUS_CODES } from "@/types/ResponseTypes";
 
 export async function repoastReel(req: Request, res: Response) {
     // TODO: add preset to schema
     const input = repoastSchema.safeParse(req.body);
 
     if (!input.success) {
-        res.status(400);
+        res.status(STATUS_CODES.INVALID_REQUEST);
         res.json({ message: "Invalid input" });
         return;
     }
@@ -24,13 +25,13 @@ export async function repoastReel(req: Request, res: Response) {
         channels = await getPresetByName(preset)
     } catch (e) {
         console.error(e)
-        res.status(500);
+        res.status(STATUS_CODES.SERVER_ERROR);
         res.json({ message: "Couldn't parse settings" });
         return
     }
 
     if (!channels) {
-        res.status(400);
+        res.status(STATUS_CODES.INVALID_REQUEST);
         res.json({ message: "No channels available for given preset" });
         return
 
@@ -38,7 +39,7 @@ export async function repoastReel(req: Request, res: Response) {
 
     ytdlp(link, async (code, filePath, newNameAsFile) => {
         if (code === 1) {
-            res.status(500);
+            res.status(STATUS_CODES.SERVER_ERROR);
             res.json({ message: "Couldnt download reel" });
             return
         }
@@ -48,10 +49,10 @@ export async function repoastReel(req: Request, res: Response) {
                 await postMediaOnChannel(client, channel, filePath, newNameAsFile);
                 await timeout(Math.floor(Math.random() * 431));
             }
-            res.status(200);
+            res.status(STATUS_CODES.INVALID_REQUEST);
             res.json();
         } catch (e) {
-            res.status(500);
+            res.status(STATUS_CODES.SERVER_ERROR);
             res.json({ message: "Couldnt download or upload reel" });
             return
         }

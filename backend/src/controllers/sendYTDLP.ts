@@ -4,11 +4,12 @@ import { postMediaOnChannel } from "@/services/discord/postOnChannel";
 import { instagramSchema } from "@/schemas/instagramSchema";
 import { timeout } from "@/helpers/timeout";
 import { ytdlp } from '@/helpers/ytdlp'
+import { STATUS_CODES } from "@/types/ResponseTypes";
 
 export async function sendYTDLP(req: Request, res: Response) {
   const input = instagramSchema.safeParse(req.body);
   if (!input.success) {
-    res.status(400);
+    res.status(STATUS_CODES.INVALID_REQUEST);
     res.json({ message: "Invalid input" });
     return;
   }
@@ -17,7 +18,7 @@ export async function sendYTDLP(req: Request, res: Response) {
 
   ytdlp(link, async (code, filePath, newNameAsFile) => {
     if (code === 1) {
-      res.status(500);
+      res.status(STATUS_CODES.SERVER_ERROR);
       res.json({ message: "Couldnt download reel" });
       return
     }
@@ -27,10 +28,10 @@ export async function sendYTDLP(req: Request, res: Response) {
         await postMediaOnChannel(client, channel, filePath, newNameAsFile);
         await timeout(Math.floor(Math.random() * 431));
       }
-      res.status(200);
+      res.status(STATUS_CODES.OK);
       res.json();
     } catch (e) {
-      res.status(500);
+      res.status(STATUS_CODES.SERVER_ERROR);
       res.json({ message: "Couldnt download reel" });
       return
     }

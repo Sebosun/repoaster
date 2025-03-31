@@ -3,7 +3,6 @@ import { repostChannelsSchema } from "@/schemas/repostChannelsSchema"
 import { STATUS_CODES } from "@/types/ResponseTypes";
 import { getSettings, updateSettings } from "@/helpers/useSettings"
 
-
 export async function getRepostChannels(_: Request, res: Response) {
     try {
         const settings = await getSettings()
