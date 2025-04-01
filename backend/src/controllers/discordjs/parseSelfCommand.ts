@@ -37,7 +37,7 @@ export const parseSelfCommand = async (
 
     const inputSplit = message.split(" ")
 
-    inputSplit.forEach((cur, idx) => {
+    for (const [idx, cur] of inputSplit.entries()) {
         if (cur.startsWith('/')) {
             const commandExists = Boolean(options.command)
             if (commandExists) {
@@ -47,7 +47,7 @@ export const parseSelfCommand = async (
             if (cur === '/repoast') {
                 options.command = cur
             }
-            return
+            continue
         }
 
         const prev = inputSplit[idx - 1]
@@ -67,7 +67,7 @@ export const parseSelfCommand = async (
         if (cur === '--preset') {
             options.preset = next
         }
-    })
+    }
 
     console.log(options)
 }

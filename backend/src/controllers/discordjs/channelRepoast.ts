@@ -1,18 +1,18 @@
 import { Client, Message } from 'discord.js-selfbot-v13'
-import { prepareMessageData } from '@/helpers/discordjs/prepareMessage'
+/* import { prepareMessageData } from '@/helpers/discordjs/prepareMessage' */
 
 function handleReferenceRepost(
     message: Message<boolean>,
     client: Client<boolean>,
 ) {
-    console.log("Handle reference repost")
+    console.log("Handle reference repost", message, client)
 }
 
 function handleMessageRepost(
     message: Message<boolean>,
     client: Client<boolean>,
 ) {
-    console.log('Message repost')
+    console.log("Handle repost", message, client)
 }
 
 export async function channelRepoast(

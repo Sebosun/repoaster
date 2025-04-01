@@ -26,7 +26,7 @@ export async function uploadImage(req: Request, res: Response) {
         if (message) {
             try {
                 message = JSON.parse(req.body.message)
-            } catch (e) {
+            } catch {
                 throw new Error("Couldnt parse JSON message")
             }
         }

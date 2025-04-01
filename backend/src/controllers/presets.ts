@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import { presetSchema } from "@/schemas/presetSchema";
-import { getSettings, updateSettings } from '@/helpers/useSettings'
+import { settings } from '@/helpers/useSettings'
 import { STATUS_CODES } from '@/types/ResponseTypes'
 
 export async function getPresets(_: Request, res: Response) {
     try {
-        const settings = await getSettings()
+        const sets = await settings.getSettings()
         res.status(STATUS_CODES.OK);
-        res.json(settings.presets);
-    } catch (e) {
+        res.json(sets.presets);
+    } catch {
         res.status(STATUS_CODES.SERVER_ERROR);
         res.json({ message: "Error parsing JSON data" });
     }
@@ -25,15 +25,15 @@ export async function savePresets(req: Request, res: Response) {
     const { data } = input
 
     try {
-        let newPresets = {
+        const newPresets = {
             presets: {}
         } as Record<string, Record<string, string[]>>
 
-        data.forEach(el => {
+        for (const el of data) {
             newPresets.presets[el.name] = el.channels
-        })
+        }
 
-        const newSettings = await updateSettings(newPresets)
+        const newSettings = await settings.updateSettings(newPresets)
 
         res.status(STATUS_CODES.INVALID_REQUEST);
         res.json(newSettings.presets);

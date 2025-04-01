@@ -21,6 +21,7 @@ export async function sendDiscordMsg(req: Request, res: Response) {
         res.status(STATUS_CODES.OK);
         res.json();
     } catch (e) {
+        console.error(e)
         res.status(STATUS_CODES.SERVER_ERROR);
         res.json({ message: "Something went wrong" });
     }

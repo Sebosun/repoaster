@@ -9,7 +9,7 @@ export const getGuildsChannel = async (client: Client, guildId: string) => {
     );
     return channelsFiltered;
   } catch (e) {
-    console.error("Something went wrong");
+    console.error("Something went wrong", e);
   }
 };
 
@@ -18,6 +18,6 @@ export const getAllGuilds = async (client: Client) => {
     const guilds = client.guilds.cache.map((guild) => guild);
     return guilds;
   } catch (e) {
-    console.error("Something went wrong");
+    console.error("Something went wrong", e);
   }
 };

@@ -8,39 +8,50 @@ export interface SaveData {
 
 const savedDataPath = getUserDataLocation()
 
-export async function getSettings(): Promise<SaveData> {
-    try {
+const useSettings = () => {
+    async function getSettings(): Promise<SaveData> {
         const data = await readFile(savedDataPath, "utf-8")
         return JSON.parse(data) as SaveData
-    } catch (e) {
-        throw e
+    }
+
+    async function updateSettings(newSettings: Partial<SaveData>) {
+        try {
+            const settings = await getSettings()
+            if (newSettings.presets) settings.presets = newSettings.presets
+            if (newSettings.repostChannels) settings.repostChannels = newSettings.repostChannels
+
+            const new_saved_items = JSON.stringify(settings)
+            await writeFile(savedDataPath, new_saved_items)
+            return settings
+        } catch (e) {
+            console.error("Error updating settings")
+            throw e
+        }
+    }
+
+    async function getPresetByName(name: string) {
+        try {
+            const settings = await getSettings()
+            if (!settings.presets) return
+
+            return settings.presets[name]
+
+        } catch (e) {
+            console.error("Error parsing preset")
+            throw e
+        }
+    }
+
+    return {
+        getSettings,
+        updateSettings,
+        getPresetByName
     }
 }
 
-export async function updateSettings(newSettings: Partial<SaveData>) {
-    try {
-        const settings = await getSettings()
-        if (newSettings.presets) settings.presets = newSettings.presets
-        if (newSettings.repostChannels) settings.repostChannels = newSettings.repostChannels
 
-        const new_saved_items = JSON.stringify(settings)
-        await writeFile(savedDataPath, new_saved_items)
-        return settings
-    } catch (e) {
-        console.error("Error updating settings")
-        throw e
-    }
-}
+const settings = useSettings()
 
-export async function getPresetByName(name: string) {
-    try {
-        const settings = await getSettings()
-        if (!settings.presets) return
-
-        return settings.presets[name]
-
-    } catch (e) {
-        console.error("Error parsing preset")
-        throw e
-    }
+export {
+    settings
 }

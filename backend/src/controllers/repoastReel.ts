@@ -1,7 +1,7 @@
 import client from "@/discordjs";
 import { Request, Response } from "express";
 import { repoastSchema } from '@/schemas/repoastSchema'
-import { getPresetByName } from "@/helpers/useSettings";
+import { settings } from "@/helpers/useSettings";
 import { ytdlp } from '@/helpers/ytdlp'
 import { postMediaOnChannel } from "@/services/discord/postOnChannel";
 import { timeout } from "@/helpers/timeout";
@@ -22,7 +22,7 @@ export async function repoastReel(req: Request, res: Response) {
     let channels
 
     try {
-        channels = await getPresetByName(preset)
+        channels = await settings.getPresetByName(preset)
     } catch (e) {
         console.error(e)
         res.status(STATUS_CODES.SERVER_ERROR);
@@ -51,7 +51,7 @@ export async function repoastReel(req: Request, res: Response) {
             }
             res.status(STATUS_CODES.INVALID_REQUEST);
             res.json();
-        } catch (e) {
+        } catch {
             res.status(STATUS_CODES.SERVER_ERROR);
             res.json({ message: "Couldnt download or upload reel" });
             return

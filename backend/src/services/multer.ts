@@ -1,4 +1,4 @@
-import { getUploadLocation } from "@/helpers/ensureUploadFileExists";
+import { getUploadLocation } from "@/helpers/useLocations"
 import multer from "multer";
 import path from "path";
 

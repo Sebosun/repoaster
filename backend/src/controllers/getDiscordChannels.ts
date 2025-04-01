@@ -19,7 +19,7 @@ export async function handleGetDiscordChannels(_: Request, res: Response) {
             return;
         }
 
-        let guildsWithChannels = [] as GuildWithChannels[];
+        const guildsWithChannels = [] as GuildWithChannels[];
 
         for (const guild of guilds) {
             try {
@@ -32,13 +32,14 @@ export async function handleGetDiscordChannels(_: Request, res: Response) {
 
                 guildsWithChannels.push({ guild, channelsDetails: channels });
             } catch (e) {
-                console.error("Something went wrong");
+                console.error("Something went wrong", e);
             }
         }
 
         res.status(STATUS_CODES.OK)
         res.json(guildsWithChannels);
     } catch (e) {
+        console.error(e)
         res.status(STATUS_CODES.SERVER_ERROR)
         res.json({ message: "GET /channels" });
     }

@@ -2,7 +2,7 @@ import { existsSync, writeFile } from "fs";
 import { mkdir } from "node:fs/promises";
 import { getUploadLocation, getInstagramLocation, getUserDataLocation } from "@/helpers/useLocations"
 
-async function ensureUserFolderExists(location: string): Promise<void> {
+export async function ensureUserFolderExists(location: string): Promise<void> {
     if (existsSync(location)) return
     try {
         await mkdir(location)
