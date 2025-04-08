@@ -5,11 +5,11 @@ import { getChannels } from "@/services/discord/getChannels";
 import { Guild, TextChannel } from "discord.js-selfbot-v13";
 import { STATUS_CODES } from "@/types/ResponseTypes";
 
-
 interface GuildWithChannels {
     guild: Guild;
     channelsDetails: Array<TextChannel>;
 }
+
 export async function handleGetDiscordChannels(_: Request, res: Response) {
     try {
         const guilds = await getAllGuilds(client);

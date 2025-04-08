@@ -18,8 +18,8 @@ router.post("/presets", savePresets);
 router.get("/repost-channels", getRepostChannels);
 router.post("/repost-channels", saveRepostsChannels);
 
-router.get('/settings', getSettings)
-router.post('/settings', saveSettings)
+/* router.get('/settings', getSettings) */
+/* router.post('/settings', saveSettings) */
 
 router.post("/upload", upload.single("image"), uploadImage);
 router.post("/message", sendDiscordMsg);

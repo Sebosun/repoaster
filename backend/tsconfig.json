@@ -1,24 +1,17 @@
 {
-    "compilerOptions": {
-        "module": "NodeNext",
-        "moduleResolution": "node",
-        "esModuleInterop": true,
-        "target": "es2015",
-        "sourceMap": true,
-        "outDir": "dist",
-        "strict": true,
-        "resolveJsonModule": true,
-        "compilerOptions": {
-            "strict": true
-        },
-        "paths": {
-            "@/*": [
-                "src/*"
-            ]
-        },
-        "baseUrl": "."
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "target": "es2015",
+    "sourceMap": true,
+    "outDir": "dist",
+    "strict": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["src/*"]
     },
-    "include": [
-        "src/**/*"
-    ]
+    "baseUrl": "."
+  },
+  "include": ["src/**/*"]
 }
