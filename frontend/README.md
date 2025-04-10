@@ -44,3 +44,7 @@ npm run build
 ```sh
 npm run lint
 ```
+
+
+# TODO:
+- [ ]  rename every repoast in code to repost and kepe the convention cause im myslef getting confused and ir efuse to take it any logner asdkaosdkoaskdoaksd

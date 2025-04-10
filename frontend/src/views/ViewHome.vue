@@ -2,7 +2,7 @@
 import SearchInput from '@/components/SearchInput.vue'
 import UploadFile from '@/components/UploadFile.vue'
 import InstagramForm from '@/components/InstagramForm.vue'
-import { getGuildFiles } from '@/services/getGuildFiles'
+import { getGuildFiles } from '@/api/guilds'
 import { onMounted, ref, computed } from 'vue'
 import { useLocalStorage } from '@/composables/useLocalStorage'
 import { API_savePresets } from '@/api/presets'

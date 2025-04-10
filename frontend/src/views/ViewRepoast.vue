@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { getGuildFiles } from '@/services/getGuildFiles'
+import { getGuildFiles } from '@/api/guilds'
 import type { GuildType } from '@/types/GuildTypes'
+import { API_getSettings, API_saveSettings } from '@/api/presets'
 
 const guildsArray = ref<GuildType[]>([])
 const selectedChannels = ref<string[]>([])
@@ -30,14 +31,25 @@ onMounted(async () => {
   try {
     const items = await getGuildFiles()
     const body = await items.json()
+    const result = await API_getSettings()
+    console.log(result)
+    selectedChannels.value = result.repostChannels
     guildsArray.value = body
   } catch (error) {
     window.alert('Backend is not running (likely)')
   }
 })
 
-const save = () => {
-  console.log('save')
+const save = async () => {
+  try {
+    const result = await API_saveSettings({
+      repostChannels: selectedChannels.value
+    })
+    console.log(result)
+  } catch (e) {
+    console.error(e)
+  }
+
 }
 </script>
 
