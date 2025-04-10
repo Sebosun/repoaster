@@ -25,8 +25,8 @@ export default defineConfig([
             /* 'unicorn/no-null': 'error', -- To think over https://github.com/sindresorhus/meta/discussions/7 */
             'unicorn/no-typeof-undefined': 'error',
             'unicorn/no-this-assignment': 'error',
-            'unicorn/no-unnecessary-array-flat-depth': 'error',
-            'unicorn/no-unnecessary-await': 'error',
+            /* 'unicorn/no-unnecessary-array-flat-depth': 'error', */
+            /* 'unicorn/no-unnecessary-await': 'error', */
             'unicorn/no-unreadable-array-destructuring': 'error',
             'unicorn/no-unreadable-iife': 'error',
             'unicorn/no-useless-fallback-in-spread': 'error',

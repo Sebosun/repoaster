@@ -25,18 +25,18 @@ export async function savePresets(req: Request, res: Response) {
     const { data } = input
 
     try {
-        const newPresets = {
+        const updatedPresets = {
             presets: {}
         } as Record<string, Record<string, string[]>>
 
         for (const el of data) {
-            newPresets.presets[el.name] = el.channels
+            updatedPresets.presets[el.name] = el.channels
         }
 
-        const newSettings = await settings.updateSettings(newPresets)
+        const updatedSettings = await settings.updateSettings(updatedPresets)
 
         res.status(STATUS_CODES.INVALID_REQUEST);
-        res.json(newSettings.presets);
+        res.json(updatedSettings.presets);
 
     } catch (e) {
         console.error(e)

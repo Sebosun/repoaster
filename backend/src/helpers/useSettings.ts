@@ -14,15 +14,15 @@ const useSettings = () => {
         return JSON.parse(data) as SaveData
     }
 
-    async function updateSettings(newSettings: Partial<SaveData>) {
+    async function updateSettings(settings: Partial<SaveData>) {
         try {
-            const settings = await getSettings()
-            if (newSettings.presets) settings.presets = newSettings.presets
-            if (newSettings.repostChannels) settings.repostChannels = newSettings.repostChannels
+            const curSettings = await getSettings()
+            if (settings.presets) curSettings.presets = settings.presets
+            if (settings.repostChannels) curSettings.repostChannels = settings.repostChannels
 
-            const new_saved_items = JSON.stringify(settings)
+            const new_saved_items = JSON.stringify(curSettings)
             await writeFile(savedDataPath, new_saved_items)
-            return settings
+            return curSettings
         } catch (e) {
             console.error("Error updating settings")
             throw e

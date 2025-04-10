@@ -37,7 +37,7 @@ export async function repoastReel(req: Request, res: Response) {
 
     }
 
-    ytdlp(link, async (code, filePath, newNameAsFile) => {
+    ytdlp(link, async (code, filePath, nameAsFile) => {
         if (code === 1) {
             res.status(STATUS_CODES.SERVER_ERROR);
             res.json({ message: "Couldnt download reel" });
@@ -46,7 +46,7 @@ export async function repoastReel(req: Request, res: Response) {
 
         try {
             for (const channel of channels) {
-                await postMediaOnChannel(client, channel, filePath, newNameAsFile);
+                await postMediaOnChannel(client, channel, filePath, nameAsFile);
                 await timeout(Math.floor(Math.random() * 431));
             }
             res.status(STATUS_CODES.INVALID_REQUEST);

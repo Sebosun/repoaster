@@ -9,11 +9,11 @@ export function getNewFileName(): string {
     const mapped = result.map(item => Number(path.parse(item).name))
     const sorted = mapped.sort((x, y) => x > y ? 1 : -1)
 
-    const newName = Number(sorted[sorted.length - 1])
+    const updatedFileName = Number(sorted.at(-1))
 
-    if (!newName) return "1"
+    if (!updatedFileName) return "1"
 
-    return `${newName + 1}`
+    return `${updatedFileName + 1}`
 }
 
 export function findNewestFile(): string {
@@ -23,7 +23,7 @@ export function findNewestFile(): string {
         const yBaseName = Number(path.parse(y).name)
         return xBaseName > yBaseName ? 1 : -1
     })
-    return sorted[sorted.length - 1]
+    return String(sorted.at(-1))
 }
 
 

@@ -4,7 +4,6 @@ import { STATUS_CODES } from "@/types/ResponseTypes";
 import { settings } from "@/helpers/useSettings"
 import type { SaveData } from "@/helpers/useSettings"
 
-
 export async function saveSettings(req: Request, res: Response) {
     const schema = settingsSchema.safeParse(req.body)
     if (!schema.success) {
@@ -13,26 +12,25 @@ export async function saveSettings(req: Request, res: Response) {
         return
     }
 
-    const { presets, repoastChannels } = schema.data
+    const { presets, repostChannels } = schema.data
 
-    const newSettingsPayload: Partial<SaveData> = {}
+    const settingsPayload: Partial<SaveData> = {}
     if (presets) {
-        newSettingsPayload.presets = {}
+        settingsPayload.presets = {}
         for (const el of presets) {
-            if (newSettingsPayload.presets) {
-                newSettingsPayload.presets[el.name] = el.channels
-
+            if (settingsPayload.presets) {
+                settingsPayload.presets[el.name] = el.channels
             }
         }
     }
 
-    if (repoastChannels) {
-        newSettingsPayload.repostChannels = repoastChannels
+    if (repostChannels) {
+        settingsPayload.repostChannels = repostChannels
     }
 
     try {
-        const sets = await settings.updateSettings(newSettingsPayload)
-        res.status(STATUS_CODES.SERVER_ERROR)
+        const sets = await settings.updateSettings(settingsPayload)
+        res.status(STATUS_CODES.OK)
         res.json(sets)
     } catch (e) {
         console.error(e)
@@ -41,4 +39,15 @@ export async function saveSettings(req: Request, res: Response) {
     }
 }
 
-/* export async function getSettings(_: Request, res: Response) { } */
+export async function getSettings(_: Request, res: Response) {
+    try {
+        const usrSettings = await settings.getSettings()
+        res.status(STATUS_CODES.OK)
+        res.json(usrSettings)
+        return
+    } catch (e) {
+        console.error(e)
+        res.status(STATUS_CODES.SERVER_ERROR)
+        res.json({ message: "Something went wrong" })
+    }
+}

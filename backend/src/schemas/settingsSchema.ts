@@ -7,5 +7,5 @@ export const settingsSchema = z.object({
                 name: z.string(),
                 channels: z.array(z.string()),
             })).optional(),
-    repoastChannels: z.array(z.string()).optional(),
+    repostChannels: z.array(z.string()).optional(),
 });

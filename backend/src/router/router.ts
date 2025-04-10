@@ -7,6 +7,7 @@ import { sendYTDLP } from "@/controllers/sendYTDLP";
 import { getPresets, savePresets } from "@/controllers/presets"
 import { repoastReel } from "@/controllers/repoastReel";
 import { getRepostChannels, saveRepostsChannels } from "@/controllers/repostChannels";
+import { getSettings, saveSettings } from "@/controllers/settings";
 
 const router = Router();
 
@@ -18,8 +19,8 @@ router.post("/presets", savePresets);
 router.get("/repost-channels", getRepostChannels);
 router.post("/repost-channels", saveRepostsChannels);
 
-/* router.get('/settings', getSettings) */
-/* router.post('/settings', saveSettings) */
+router.get('/settings', getSettings)
+router.patch('/settings', saveSettings)
 
 router.post("/upload", upload.single("image"), uploadImage);
 router.post("/message", sendDiscordMsg);

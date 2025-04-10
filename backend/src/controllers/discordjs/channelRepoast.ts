@@ -28,5 +28,4 @@ export async function channelRepoast(
     }
 
     handleMessageRepost(message, client)
-
 }
