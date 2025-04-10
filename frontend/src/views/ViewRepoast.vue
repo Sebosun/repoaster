@@ -1,11 +1,33 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { getGuildFiles } from '@/api/guilds'
 import type { GuildType } from '@/types/GuildTypes'
 import { API_getSettings, API_saveSettings } from '@/api/presets'
 
-const guildsArray = ref<GuildType[]>([])
+const guilds = ref<GuildType[]>([])
+const savedSelectedChannels = ref<string[]>([])
 const selectedChannels = ref<string[]>([])
+
+const guildsSorted = computed(() => {
+
+  const guildsCopy = [...guilds.value] as GuildType[]
+  const dupa = guildsCopy.sort((first, second) => {
+    let score_first = 0
+    let score_second = 0
+    for (const channel of first.channelsDetails) {
+      if (savedSelectedChannels.value.includes(channel.id)) {
+        score_first += 1
+      }
+    }
+    for (const channel of second.channelsDetails) {
+      if (savedSelectedChannels.value.includes(channel.id)) {
+        score_second += 1
+      }
+    }
+    return score_second - score_first
+  })
+  return dupa
+})
 
 const getChannelName = (guild: GuildType, channelId: string) => {
   const channels = guild?.channelsDetails
@@ -32,9 +54,9 @@ onMounted(async () => {
     const items = await getGuildFiles()
     const body = await items.json()
     const result = await API_getSettings()
-    console.log(result)
     selectedChannels.value = result.repostChannels
-    guildsArray.value = body
+    savedSelectedChannels.value = result.repostChannels
+    guilds.value = body
   } catch (error) {
     window.alert('Backend is not running (likely)')
   }
@@ -45,7 +67,7 @@ const save = async () => {
     const result = await API_saveSettings({
       repostChannels: selectedChannels.value
     })
-    console.log(result)
+    savedSelectedChannels.value = result.repostChannels
   } catch (e) {
     console.error(e)
   }
@@ -60,8 +82,8 @@ const save = async () => {
     <button class="btn btn-sm btn-outline btn-primary" @click="save">
       Save
     </button>
-    <template v-if="guildsArray">
-      <div class="collapse" v-for="guild in guildsArray" :key="guild.guild.id">
+    <template v-if="guilds">
+      <div class="collapse" v-for="guild in guildsSorted" :key="guild.guild.id">
         <input type="checkbox" />
 
         <div class="collapse-title flex text-xl font-medium bg-base-200 rounded-md my-4 pr-6">

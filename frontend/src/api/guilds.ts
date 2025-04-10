@@ -1,4 +1,4 @@
-export async function getGuildFiles() {
+async function getGuildFiles() {
   const baseURL = 'http://localhost:3000'
 
   const channels = await fetch(`${baseURL}/channels`, {
@@ -7,3 +7,5 @@ export async function getGuildFiles() {
 
   return channels
 }
+
+export { getGuildFiles }
