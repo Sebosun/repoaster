@@ -17,6 +17,7 @@ const options = ref<Options>({
 })
 const guildsArray = ref<GuildType[]>([])
 const searchChannel = ref('')
+const expandAll = ref<boolean>(true)
 
 const {
   localStorageItems,
@@ -61,36 +62,41 @@ const selectedCount = (guild: GuildType): number => {
 
 const guildsFiltered = computed<GuildType[]>(() => {
   const acc = [] as GuildType[]
-  guildsArray.value.forEach((guild) => {
+
+  for (const guild of guildsArray.value) {
     const newChannels = guild.guild.channels.filter((channel) => {
       const channelName = getChannelName(guild, channel)
       return channelName?.includes(searchChannel.value)
     })
+
+    if (newChannels.length <= 0) {
+      continue
+    }
 
     const guildReturn = {
       guild: { ...guild.guild, channels: newChannels },
       channelsDetails: guild.channelsDetails
     }
     acc.push(guildReturn)
-  })
+  }
 
   if (searchChannel.value.length > 0) {
     acc.sort((_, second) => second.guild.channels.length)
   }
 
   acc.sort((guild1, guild2) => {
-    const guild1InFavorites = isInPreset(guild1)
-    const guild2InFavorites = isInPreset(guild2)
+    const isFirstInPreset = isInPreset(guild1)
+    const isSecondInPreset = isInPreset(guild2)
 
-    if (guild1InFavorites && !guild2InFavorites) {
+    if (isFirstInPreset && !isSecondInPreset) {
       return -1
     }
 
-    if (!guild1InFavorites && guild2InFavorites) {
+    if (!isFirstInPreset && isSecondInPreset) {
       return 1
     }
 
-    if (guild1InFavorites && guild2InFavorites) {
+    if (isFirstInPreset && isSecondInPreset) {
       const guild1Count = selectedCount(guild1)
       const guild2Count = selectedCount(guild2)
       return guild1Count > guild2Count ? -1 : 1
@@ -172,40 +178,57 @@ onMounted(async () => {
           </button>
         </div>
 
-        <SearchInput v-model="searchChannel" />
+        <div class="flex">
+          <SearchInput class="w-full" v-model="searchChannel" />
+          <div class="btn btn-neutral text-lg w-[25%] ml-2 px-4 self-center text-center cursor-pointer"
+            @click="expandAll = !expandAll">
+            <Transition mode="out-in">
+              <div v-if="expandAll">
+                Expand all
+              </div>
+              <div v-else>
+                Hide
+              </div>
+            </Transition>
+          </div>
+        </div>
 
         <template v-if="guildsArray">
-          <div class="collapse" v-for="guild in guildsFiltered" :key="guild.guild.id">
-            <input type="checkbox" />
+          <TransitionGroup name="list" tag="div">
+            <div class="collapse" :class="{ 'collapse-open': expandAll }" v-for="guild in guildsFiltered"
+              :key="guild.guild.id">
+              <input type="checkbox" />
 
-            <div class="collapse-title flex text-xl font-medium bg-base-200 rounded-md my-4 pr-6">
-              {{ guild.guild.name }}
-              <span class="opacity-50"> ({{ guild.guild.channels.length }}) </span>
-              <span class="ml-auto" v-if="isInPreset(guild)"> ⭐ {{ selectedCount(guild) }}</span>
+              <div class="collapse-title flex text-xl font-medium bg-base-200 rounded-md my-4 pr-6">
+                {{ guild.guild.name }}
+                <span class="opacity-50"> ({{ guild.guild.channels.length }}) </span>
+                <span class="ml-auto" v-if="isInPreset(guild)"> ⭐ {{ selectedCount(guild) }}</span>
+              </div>
+
+              <div class="collapse-content">
+                <template v-for="channel in guild.guild.channels" :key="channel">
+                  <div v-if="getChannelName(guild, channel)">
+                    <label class="label cursor-pointer">
+                      <input class="checkbox checkbox-primary" type="checkbox" :id="channel" :value="channel"
+                        v-model="selectedChannels" />
+                      <span class="text-lg">{{ getChannelName(guild, channel) }} </span>
+                    </label>
+                  </div>
+                </template>
+              </div>
             </div>
 
-            <div class="collapse-content">
-              <template v-for="channel in guild.guild.channels" :key="channel">
-                <div v-if="getChannelName(guild, channel)">
-                  <label class="label cursor-pointer">
-                    <input class="checkbox checkbox-primary" type="checkbox" :id="channel" :value="channel"
-                      v-model="selectedChannels" />
-                    <span class="text-lg">{{ getChannelName(guild, channel) }} </span>
-                  </label>
-                </div>
-              </template>
-            </div>
-          </div>
+          </TransitionGroup>
         </template>
       </div>
+
       <div>
         <div class="flex gap-4 justify-end">
           <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'message' }"
             @click="options.type = 'message'">
             Message/File
           </button>
-          <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'ytdlp' }"
-            @click="options.type = 'ytdlp'">
+          <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'ytdlp' }" @click="options.type = 'ytdlp'">
             ytdlp
           </button>
         </div>
@@ -225,3 +248,16 @@ onMounted(async () => {
     </div>
   </main>
 </template>
+
+<style scoped>
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(45px);
+}
+</style>
