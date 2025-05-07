@@ -17,7 +17,7 @@ const options = ref<Options>({
 })
 const guildsArray = ref<GuildType[]>([])
 const searchChannel = ref('')
-const expandAll = ref<boolean>(true)
+const expandAll = ref<boolean>(false)
 
 const {
   localStorageItems,
@@ -182,8 +182,8 @@ onMounted(async () => {
           <SearchInput class="w-full" v-model="searchChannel" />
           <div class="btn btn-neutral text-lg w-[25%] ml-2 px-4 self-center text-center cursor-pointer"
             @click="expandAll = !expandAll">
-            <Transition mode="out-in">
-              <div v-if="expandAll">
+            <Transition name="pop-up" mode="out-in">
+              <div v-if="!expandAll">
                 Expand all
               </div>
               <div v-else>
@@ -259,5 +259,20 @@ onMounted(async () => {
 .list-leave-to {
   opacity: 0;
   transform: translateX(45px);
+}
+
+
+.pop-up-enter-active,
+.pop-up-leave-active {
+  transition: all 0.2s ease;
+}
+
+.pop-up-enter-from {
+  opacity: 0;
+  transform: translateY(-25px);
+}
+.pop-up-leave-to {
+  opacity: 0;
+  transform: translateY(25px);
 }
 </style>
