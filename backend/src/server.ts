@@ -10,6 +10,8 @@ const app = express();
 app.use(express.json()); // Middleware to parse JSON data
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.options('*', cors())
+
 
 // TODO: get some better logging
 app.use((req, _, next) => {
