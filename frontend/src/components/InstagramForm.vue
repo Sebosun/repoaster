@@ -43,6 +43,15 @@ const submit = async () => {
       class="input input-bordered w-full mb-4"
       placeholder="Your link"
     />
+    <div class="flex flex-col gap-2">
+      <div>
+        <p>Currently handles platforms:</p>
+        <ul>
+          <li>Instagram</li>
+        </ul>
+      </div>
+      <p>Max file size: 8MB</p>
+    </div>
     <AlertSuccess v-if="uploadSuccess" class="mb-4" message="Succesfully uploaded instagram vid" />
     <AlertError v-if="uploadError" class="mb-4" message="Error, likely link is not valid" />
 

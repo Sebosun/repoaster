@@ -1,4 +1,4 @@
-import { ref, computed, watch } from "vue"
+import { ref, computed, watch } from 'vue'
 import { areArraysSame } from '@/utils/areArraysDiff'
 
 type PresetType = {
@@ -16,7 +16,7 @@ export const useLocalStorage = () => {
 
       const localChannels = getLocalChannels()
       if (localChannels) {
-        const channelsFiltered = localChannels.filter(item => item.name !== saveName.value)
+        const channelsFiltered = localChannels.filter((item) => item.name !== saveName.value)
         const combineLocal = [...channelsFiltered, newType]
         localStorage.setItem('presets', JSON.stringify(combineLocal))
         localStorageItems.value = combineLocal
@@ -34,7 +34,7 @@ export const useLocalStorage = () => {
   const deletePreset = (presetName: string) => {
     const localChannels = getLocalChannels()
     if (!localChannels) return
-    const channelsFiltered = localChannels?.filter(item => item.name !== presetName)
+    const channelsFiltered = localChannels?.filter((item) => item.name !== presetName)
     localStorage.setItem('presets', JSON.stringify(channelsFiltered))
     localStorageItems.value = channelsFiltered
     selectedPreset.value = ''
@@ -52,14 +52,14 @@ export const useLocalStorage = () => {
   const localStorageItems = ref<PresetType[]>(getLocalChannels() || [])
   const selectedPreset = ref<string>(localStorageItems.value[0]?.name ?? '')
   const selectedChannels = ref<string[]>(localStorageItems.value[0]?.channels || [])
-  const saveName = ref<string>('')
+  const saveName = ref<string>(localStorageItems.value[0]?.name ?? '')
 
   const currentPreset = computed(() => {
-    return localStorageItems.value.find(item => item.name === selectedPreset.value)
+    return localStorageItems.value.find((item) => item.name === selectedPreset.value)
   })
 
   watch(selectedPreset, (newSelection) => {
-    const findChannel = localStorageItems.value.find(item => item.name === newSelection)?.channels
+    const findChannel = localStorageItems.value.find((item) => item.name === newSelection)?.channels
     selectedChannels.value = findChannel ?? []
     saveName.value = newSelection
   })
@@ -80,6 +80,6 @@ export const useLocalStorage = () => {
     selectedChannels,
     areLocalItemsSame,
     saveName,
-    selectedPreset,
+    selectedPreset
   }
 }

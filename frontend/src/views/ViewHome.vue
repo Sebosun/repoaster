@@ -16,7 +16,7 @@ const options = ref<Options>({
   type: 'ytdlp'
 })
 const guildsArray = ref<GuildType[]>([])
-const searchChannel = ref('')
+const searchString = ref('')
 const expandAll = ref<boolean>(false)
 
 const {
@@ -32,7 +32,6 @@ const {
 
 const savePresetBackend = async () => {
   if (!currentPreset.value) return
-  console.log(currentPreset.value)
   try {
     await API_savePresets(localStorageItems.value)
   } catch (e) {
@@ -64,23 +63,28 @@ const guildsFiltered = computed<GuildType[]>(() => {
   const acc = [] as GuildType[]
 
   for (const guild of guildsArray.value) {
+    const guildNameIncludes = guild.guild.name.includes(searchString.value)
+
     const newChannels = guild.guild.channels.filter((channel) => {
       const channelName = getChannelName(guild, channel)
-      return channelName?.includes(searchChannel.value)
+      return channelName?.includes(searchString.value)
     })
 
-    if (newChannels.length <= 0) {
+    if (newChannels.length <= 0 && !guildNameIncludes) {
       continue
     }
 
+    // so we dont show empty guild when children miss string check
+    const whichGuildsToReturn = newChannels.length === 0 ? guild.guild.channels : newChannels
+
     const guildReturn = {
-      guild: { ...guild.guild, channels: newChannels },
+      guild: { ...guild.guild, channels: whichGuildsToReturn },
       channelsDetails: guild.channelsDetails
     }
     acc.push(guildReturn)
   }
 
-  if (searchChannel.value.length > 0) {
+  if (searchString.value.length > 0) {
     acc.sort((_, second) => second.guild.channels.length)
   }
 
@@ -121,6 +125,7 @@ const getSelectedChannelDetails = computed(() => {
   guildsArray.value.forEach((guild) => {
     selectedChannels.value.forEach((item) => {
       const channel = guild.channelsDetails.find((channel) => channel.id === item)
+      console.log(channel)
       if (channel) acc.push(channel)
     })
   })
@@ -146,57 +151,71 @@ onMounted(async () => {
   <main class="text-white mx-auto min-w-96 w-full">
     <div class="grid grid-cols-2 p-8 gap-8 bg-gray-800 text-gray-200">
       <div>
-        <div class="mt-4 flex gap-4 items-center justify-between">
+        <div class="mt-4 flex gap-4 justify-between">
           <div>
             Selected preset: <span class="font-bold"> {{ selectedPreset }} </span>
           </div>
-          <button class="btn btn-sm btn-outline btn-error" @click="deletePreset(selectedPreset)">
-            Delete current preset
-          </button>
+          <div class="flex flex-col gap-4 w-fit">
+            <button
+              class="btn btn-sm btn-outline btn-error w-fit"
+              @click="deletePreset(selectedPreset)"
+            >
+              Delete current preset
+            </button>
+            <button class="btn btn-sm btn-info w-fit" @click="savePresetBackend">
+              Backup all presets on backend
+            </button>
+          </div>
         </div>
         <h1 class="font-bold text-xl mt-4">Presets</h1>
         <div class="flex flex-wrap gap-4 my-4">
           <button @click="selectedPreset = ''" class="badge badge-warning">Reset</button>
 
-          <button @click="selectedPreset = item.name" class="badge badge-info" v-for="item in localStorageItems"
-            :key="item.name">
+          <button
+            @click="selectedPreset = item.name"
+            class="badge badge-info"
+            v-for="item in localStorageItems"
+            :key="item.name"
+          >
             {{ item.name }}
           </button>
         </div>
         <div class="flex items-center gap-4">
           <label class="input flex items-center gap-2 max-w-96 my-5">
-            <input type="text" class="grow bg-inherit input-bordered input-primary" placeholder="Preset name"
-              v-model="saveName" />
+            <input
+              type="text"
+              class="grow bg-inherit input-bordered input-primary"
+              placeholder="New preset name"
+              v-model="saveName"
+            />
           </label>
 
           <button class="btn btn-info" :disabled="areLocalItemsSame" @click="savePreset">
             Save
           </button>
-
-          <button class="btn btn-info" :disabled="areLocalItemsSame" @click="savePresetBackend">
-            Save Preset On The Backend
-          </button>
         </div>
 
         <div class="flex">
-          <SearchInput class="w-full" v-model="searchChannel" />
-          <div class="btn btn-neutral text-lg w-[25%] ml-2 px-4 self-center text-center cursor-pointer"
-            @click="expandAll = !expandAll">
+          <SearchInput class="w-full" v-model="searchString" />
+          <div
+            class="btn btn-neutral text-lg w-[25%] ml-2 px-4 self-center text-center cursor-pointer"
+            @click="expandAll = !expandAll"
+          >
             <Transition name="pop-up" mode="out-in">
-              <div v-if="!expandAll">
-                Expand all
-              </div>
-              <div v-else>
-                Hide
-              </div>
+              <div v-if="!expandAll">Expand all</div>
+              <div v-else>Hide</div>
             </Transition>
           </div>
         </div>
 
         <template v-if="guildsArray">
           <TransitionGroup name="list" tag="div">
-            <div class="collapse" :class="{ 'collapse-open': expandAll }" v-for="guild in guildsFiltered"
-              :key="guild.guild.id">
+            <div
+              class="collapse"
+              :class="{ 'collapse-open': expandAll }"
+              v-for="guild in guildsFiltered"
+              :key="guild.guild.id"
+            >
               <input type="checkbox" />
 
               <div class="collapse-title flex text-xl font-medium bg-base-200 rounded-md my-4 pr-6">
@@ -209,26 +228,37 @@ onMounted(async () => {
                 <template v-for="channel in guild.guild.channels" :key="channel">
                   <div v-if="getChannelName(guild, channel)">
                     <label class="label cursor-pointer">
-                      <input class="checkbox checkbox-primary" type="checkbox" :id="channel" :value="channel"
-                        v-model="selectedChannels" />
+                      <input
+                        class="checkbox checkbox-primary"
+                        type="checkbox"
+                        :id="channel"
+                        :value="channel"
+                        v-model="selectedChannels"
+                      />
                       <span class="text-lg">{{ getChannelName(guild, channel) }} </span>
                     </label>
                   </div>
                 </template>
               </div>
             </div>
-
           </TransitionGroup>
         </template>
       </div>
 
       <div>
         <div class="flex gap-4 justify-end">
-          <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'message' }"
-            @click="options.type = 'message'">
+          <button
+            class="btn btn-sm"
+            :class="{ 'btn-accent': options.type === 'message' }"
+            @click="options.type = 'message'"
+          >
             Message/File
           </button>
-          <button class="btn btn-sm" :class="{ 'btn-accent': options.type === 'ytdlp' }" @click="options.type = 'ytdlp'">
+          <button
+            class="btn btn-sm"
+            :class="{ 'btn-accent': options.type === 'ytdlp' }"
+            @click="options.type = 'ytdlp'"
+          >
             ytdlp
           </button>
         </div>
@@ -260,7 +290,6 @@ onMounted(async () => {
   opacity: 0;
   transform: translateX(45px);
 }
-
 
 .pop-up-enter-active,
 .pop-up-leave-active {
