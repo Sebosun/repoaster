@@ -1,7 +1,9 @@
-async function getGuildFiles() {
-  const baseURL = 'http://localhost:3000'
+import { constructURL } from '@/api/helpers'
 
-  const channels = await fetch(`${baseURL}/channels`, {
+async function getGuildFiles() {
+  const endpoint = constructURL('/channels')
+
+  const channels = await fetch(endpoint, {
     method: 'GET'
   })
 

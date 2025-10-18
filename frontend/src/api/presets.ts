@@ -1,5 +1,4 @@
-/* TODO: move into env or something */
-const baseURL = 'http://localhost:3000'
+import { constructURL } from '@/api/helpers'
 
 export type Preset = {
   name: string
@@ -13,24 +12,28 @@ export type SettingsResponse = {
   repostChannels: string[]
 }
 
+export const API_savePresets = (preset: Preset[]) => {
+  const endpoint = constructURL('/presets')
+  const payload = JSON.stringify(preset)
 
-export const API_savePresets = (preset: Preset[]) =>
-  fetch(`${baseURL}/presets`, {
+  return fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(preset)
+    body: payload
   })
+}
 
-export const API_getPresets = () =>
-  fetch(`${baseURL}/presets`, {
+export const API_getPresets = () => {
+  const endpoint = constructURL('/presets')
+  return fetch(endpoint, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
     }
   })
-
+}
 
 interface SaveSettingsPayload {
   presets?: Preset
@@ -38,25 +41,27 @@ interface SaveSettingsPayload {
 }
 
 export const API_getSettings = async () => {
-  const result = await fetch(`${baseURL}/settings`, {
+  const endpoint = constructURL('/settings')
+  const result = await fetch(endpoint, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
-    },
+    }
   })
 
-  const settingsJSONED = await result.json() as SettingsResponse
+  const settingsJSONED = (await result.json()) as SettingsResponse
   return settingsJSONED
 }
 
 export const API_saveSettings = async (updatedSettings: SaveSettingsPayload) => {
-  const result = await fetch(`${baseURL}/settings`, {
+  const endpoint = constructURL('/settings')
+  const result = await fetch(endpoint, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(updatedSettings)
   })
-  const settingsJSONED = await result.json() as SettingsResponse
+  const settingsJSONED = (await result.json()) as SettingsResponse
   return settingsJSONED
 }
