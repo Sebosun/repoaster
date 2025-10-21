@@ -4,9 +4,12 @@ import { uploadImage } from "@/controllers/uploadImage";
 import { sendDiscordMsg } from "@/controllers/sendDiscordMsg";
 import { handleGetDiscordChannels } from "@/controllers/getDiscordChannels";
 import { sendYTDLP } from "@/controllers/sendYTDLP";
-import { getPresets, savePresets } from "@/controllers/presets"
+import { getPresets, savePresets } from "@/controllers/presets";
 import { repoastReel } from "@/controllers/repoastReel";
-import { getRepostChannels, saveRepostsChannels } from "@/controllers/repostChannels";
+import {
+  getRepostChannels,
+  saveRepostsChannels,
+} from "@/controllers/repostChannels";
 import { getSettings, saveSettings } from "@/controllers/settings";
 
 const router = Router();
@@ -19,15 +22,15 @@ router.post("/presets", savePresets);
 router.get("/repost-channels", getRepostChannels);
 router.post("/repost-channels", saveRepostsChannels);
 
-router.get('/settings', getSettings)
-router.patch('/settings', saveSettings)
+router.get("/settings", getSettings);
+router.patch("/settings", saveSettings);
 
 router.post("/upload", upload.single("image"), uploadImage);
 router.post("/message", sendDiscordMsg);
 
-router.post("/ytdlp", sendYTDLP)
+router.post("/ytdlp", sendYTDLP);
 router.use("/channels", handleGetDiscordChannels);
 
-router.use("/repoast/reel", repoastReel)
+router.use("/repoast/reel", repoastReel);
 
 export default router;

@@ -1,11 +1,11 @@
 import { Client } from "discord.js-selfbot-v13";
 import dotenv from "dotenv";
-import { parseSelfCommand } from '@/controllers/discordjs/parseSelfCommand'
-import { channelRepoast } from '@/controllers/discordjs/channelRepoast'
+import { parseSelfCommand } from "@/controllers/discordjs/parseSelfCommand";
+import { channelRepoast } from "@/controllers/discordjs/channelRepoast";
 
 dotenv.config();
 
-const client = new Client({ checkUpdate: false });
+const client = new Client();
 
 const token = process.env.TOKEN;
 const testGuild = process.env.TEST_GUILD;
@@ -16,16 +16,16 @@ if (!testGuild) throw new Error("No test guild");
 client.login(token);
 
 client.on("ready", async () => {
-    console.log("Bot is ready");
+  console.log("Bot is ready");
 });
 
-const chId = '1354834396879913041'
+const chId = "1354834396879913041";
 
-client.on('messageCreate', (message) => {
-    if (chId === message.channelId) {
-        channelRepoast(message, client)
-    }
-    parseSelfCommand(message, client)
-})
+client.on("messageCreate", (message) => {
+  if (chId === message.channelId) {
+    channelRepoast(message, client);
+  }
+  parseSelfCommand(message, client);
+});
 
 export default client;
