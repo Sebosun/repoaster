@@ -4,7 +4,7 @@ export function repostYtdlp(link: string, channels: string[]) {
   const endpoint = constructURL('/ytdlp')
   const payload = JSON.stringify({ link, channels })
 
-  return fetch(`${endpoint}/ytdlp`, {
+  return fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
