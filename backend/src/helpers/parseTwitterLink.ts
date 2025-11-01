@@ -12,11 +12,11 @@ export function isTwitterLink(link: string) {
 export function parseTwitterLink(link: string) {
   const twtSiteWithPreviews = "https://vxtwitter.com";
 
-  let newStr = link.replace(BASE_REGEX, twtSiteWithPreviews);
-  newStr = removeQueryFromUrl(newStr);
+  const previewSite = link.replace(BASE_REGEX, twtSiteWithPreviews);
+  const removedQuery = removeQueryFromUrl(previewSite);
   // case where link is not a valid twitter link
-  if (!newStr) {
+  if (!removedQuery) {
     return link;
   }
-  return newStr;
+  return removedQuery;
 }

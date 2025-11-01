@@ -6,6 +6,7 @@ import { channelRepoast } from "@/controllers/discordjs/channelRepoast";
 dotenv.config();
 
 const client = new Client();
+// const client = new Client({ checkUpdate: false });
 
 const token = process.env.TOKEN;
 const testGuild = process.env.TEST_GUILD;

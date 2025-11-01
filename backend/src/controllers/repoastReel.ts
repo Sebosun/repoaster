@@ -8,7 +8,6 @@ import { timeout } from "@/helpers/timeout";
 import { STATUS_CODES } from "@/types/ResponseTypes";
 
 export async function repoastReel(req: Request, res: Response) {
-  // TODO: add preset to schema
   const input = repoastSchema.safeParse(req.body);
 
   if (!input.success) {
@@ -36,25 +35,33 @@ export async function repoastReel(req: Request, res: Response) {
     return;
   }
 
-  ytdlp(link, async (code, filePath, nameAsFile) => {
-    if (code === 1) {
-      res.status(STATUS_CODES.SERVER_ERROR);
-      res.json({ message: "Couldnt download reel" });
-      return;
-    }
-
-    try {
-      for (const channel of channels) {
-        await postMediaOnChannel(client, channel, filePath, nameAsFile);
-        // So we don't spam discord with bazillion requests and get banned
-        await timeout(Math.floor(Math.random() * 431));
+  ytdlp(
+    link,
+    async (code, filePath, nameAsFile) => {
+      if (code === 1) {
+        res.status(STATUS_CODES.SERVER_ERROR);
+        res.json({ message: "Couldnt download reel" });
+        return;
       }
-      res.status(STATUS_CODES.OK);
-      res.json({ message: "success" });
-    } catch {
-      res.status(STATUS_CODES.SERVER_ERROR);
-      res.json({ message: "Couldnt download or upload reel" });
+
+      try {
+        for (const channel of channels) {
+          await postMediaOnChannel(client, channel, filePath, nameAsFile);
+          // So we don't spam discord with bazillion requests and get banned
+          await timeout(Math.floor(Math.random() * 431));
+        }
+        res.status(STATUS_CODES.OK);
+        res.json({ message: "success" });
+      } catch {
+        res.status(STATUS_CODES.SERVER_ERROR);
+        res.json({ message: "Couldnt download or upload reel" });
+        return;
+      }
+    },
+    (errorMessage) => {
+      res.status(STATUS_CODES.INVALID_REQUEST);
+      res.json({ message: errorMessage });
       return;
-    }
-  });
+    },
+  );
 }

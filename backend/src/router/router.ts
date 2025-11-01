@@ -28,9 +28,9 @@ router.patch("/settings", saveSettings);
 router.post("/upload", upload.single("image"), uploadImage);
 router.post("/message", sendDiscordMsg);
 
-router.post("/ytdlp", sendYTDLP);
 router.use("/channels", handleGetDiscordChannels);
 
+router.post("/ytdlp", sendYTDLP);
 router.use("/repoast/reel", repoastReel);
 
 export default router;

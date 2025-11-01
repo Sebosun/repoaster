@@ -16,25 +16,33 @@ export async function sendYTDLP(req: Request, res: Response) {
 
   const { link, channels } = input.data;
 
-  ytdlp(link, async (code, filePath, filename) => {
-    if (code === 1) {
-      res.status(STATUS_CODES.SERVER_ERROR);
-      res.json({ message: "Couldnt download reel" });
-      return;
-    }
-
-    try {
-      for (const channel of channels) {
-        await postMediaOnChannel(client, channel, filePath, filename);
-        await timeout(Math.floor(Math.random() * 431));
+  ytdlp(
+    link,
+    async (code, filePath, filename) => {
+      if (code === 1) {
+        res.status(STATUS_CODES.SERVER_ERROR);
+        res.json({ message: "Couldnt download reel" });
+        return;
       }
-      res.status(STATUS_CODES.OK);
-      res.json();
-    } catch (e) {
-      console.error(e);
-      res.status(STATUS_CODES.SERVER_ERROR);
-      res.json({ message: "Couldnt download reel" });
+
+      try {
+        for (const channel of channels) {
+          await postMediaOnChannel(client, channel, filePath, filename);
+          await timeout(Math.floor(Math.random() * 431));
+        }
+        res.status(STATUS_CODES.OK);
+        res.json();
+      } catch (e) {
+        console.error(e);
+        res.status(STATUS_CODES.SERVER_ERROR);
+        res.json({ message: "Couldnt download reel" });
+        return;
+      }
+    },
+    (errorMessage) => {
+      res.status(STATUS_CODES.INVALID_REQUEST);
+      res.json({ message: errorMessage });
       return;
-    }
-  });
+    },
+  );
 }

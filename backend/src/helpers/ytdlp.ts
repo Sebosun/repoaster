@@ -10,12 +10,15 @@ export type CallbackType = (
   nameAsFile: string,
 ) => Promise<void> | void;
 
+export type ErrorCallbackType = (reason: string) => void;
+
 const maxSize = 8;
 const maxFileSize = `${maxSize}M`;
 
 export async function ytdlp(
   link: string,
   callback: CallbackType,
+  onError: ErrorCallbackType,
 ): Promise<void> {
   // TODO: new approach - we download file whatever it is, with max file size 500MB+
   // We then check the file on the drive, if it's not a video or is bigger than 8mb
@@ -25,6 +28,7 @@ export async function ytdlp(
 
   const isEnough = await getFileApproximateSize(link);
   if (!isEnough) {
+    onError("File size is too big");
     return;
   }
 
